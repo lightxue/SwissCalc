@@ -77,11 +77,11 @@ class Calc(Parser):
         'string',
         'pointfloat', 'exponentfloat',
         'add', 'subtract', 'multiply', 'divide',
-        'modulo', 'exponent', 'factorial',
+        'modulo', 'power', 'factorial',
         'lshift', 'rshift', 'and', 'not', 'or', 'xor',
         'assign',
         'addassign', 'subassign', 'mulassign', 'divassign',
-        'modassign', 'expassign',
+        'modassign', 'powassign',
         'lsftassign', 'rsftassign',
         'andassign', 'notassign', 'orassign', 'xorassign',
         'lparen', 'rparen', 'comma',
@@ -99,7 +99,7 @@ class Calc(Parser):
     t_multiply   = r'\*'
     t_divide     = r'/'
     t_modulo     = r'%'
-    t_exponent   = r'\*\*'
+    t_power      = r'\*\*'
     t_factorial  = r'!'
 
     # bit operator
@@ -117,7 +117,7 @@ class Calc(Parser):
     t_mulassign  = r'\*='
     t_divassign  = r'/='
     t_modassign  = r'%='
-    t_expassign  = r'\*\*='
+    t_powassign  = r'\*\*='
 
     t_lsftassign = r'<<='
     t_rsftassign = r'>>='

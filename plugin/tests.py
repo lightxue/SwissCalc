@@ -146,7 +146,7 @@ class LexTest(unittest.TestCase):
         self.assertEqual(tok.type, 'modulo')
 
         tok = calc._lexme('**')[0]
-        self.assertEqual(tok.type, 'exponent')
+        self.assertEqual(tok.type, 'power')
 
         tok = calc._lexme('!')[0]
         self.assertEqual(tok.type, 'factorial')
@@ -192,7 +192,7 @@ class LexTest(unittest.TestCase):
         self.assertEqual(tok.type, 'modassign')
 
         tok = calc._lexme('**=')[0]
-        self.assertEqual(tok.type, 'expassign')
+        self.assertEqual(tok.type, 'powassign')
 
         tok = calc._lexme('<<=')[0]
         self.assertEqual(tok.type, 'lsftassign')
