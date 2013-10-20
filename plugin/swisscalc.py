@@ -12,6 +12,7 @@ if sys.version_info[0] >= 3:
     raw_input = input
 
 import ply.lex as lex
+from ply.lex import TOKEN
 import ply.yacc as yacc
 import os
 
@@ -54,22 +55,25 @@ class Parser(object):
                 break
             self.execute(s)
 
+    def _lexme(self, s):
+        self.lexer.input(s)
+        return [tok for tok in self.lexer]
+
     def _runlex(self):
         while True:
             try:
                 s = raw_input('lexer > ')
             except EOFError:
                 break
-            self.lexer.input(s)
-            for tok in self.lexer:
+            for tok in self._lexme(s):
+                print tok.type, tok.value
                 print tok
 
 class Calc(Parser):
     tokens = (
         'ident',
-        'string',
-        'decint', 'octint', 'hexint', 'binint'
-        'pointfloat', 'exponentfloat',
+        'newline',
+        'binint', 'octint', 'hexint', 'decint',
     )
 
     # Tokens
@@ -82,72 +86,76 @@ class Calc(Parser):
         r'\n+'
         t.lexer.lineno += t.value.count("\n")
 
-    _escapeseq = r'\\.'
-    _stringchar = (r"[^\\']", r'[^\\"]')
-    _singlequote = "'(%s|%s)*'" % (_escapeseq, _stringchar[0])
-    _doublequote = "'(%s|%s)*'" % (_escapeseq, _stringchar[1])
-    def t_string(self, t):
-        'hello'
-        #__doc__ == r'[rR](%s)|(%s)' % (self._singlequote, self._doublequote)
-        return t
+    #_escapeseq = r'\\.'
+    #_stringchar = (r"[^\\']", r'[^\\"]')
+    #_singlequote = "'(%s|%s)*'" % (_escapeseq, _stringchar[0])
+    #_doublequote = "'(%s|%s)*'" % (_escapeseq, _stringchar[1])
+    #def t_string(self, t):
+        #'hello'
+        ##__doc__ == r'[rR](%s)|(%s)' % (self._singlequote, self._doublequote)
+        #return t
 
-    def t_decint(self, t):
-        r'[1-9][0-9]*|0'
+    def t_binint(self, t):
+        r'0[bB][01]+'
+        t.value = int(t.value, 2)
         return t
 
     def t_octint(self, t):
         r'0[oO]?[0-7]+'
+        t.value = int(t.value, 8)
         return t
 
     def t_hexint(self, t):
         r'0[xX][0-9a-fA-F]+'
+        t.value = int(t.value, 16)
         return t
 
-    def t_binint(self, t):
-        r'0[bB][01]+'
+    def t_decint(self, t):
+        r'[1-9][0-9]*|0'
+        t.value = int(t.value)
         return t
 
-    def t_pointfloat(self, t):
-        r'[0-9]+.[0-9]+'
-        return t
+    #def t_pointfloat(self, t):
+        #r'[0-9]+.[0-9]+'
+        #return t
 
-    def t_exponentfloat(self, t):
-        r'[0-9](.[0-9]+)?[eE][+-]?[0-9]+'
-        return t
+    #def t_exponentfloat(self, t):
+        #r'[0-9](.[0-9]+)?[eE][+-]?[0-9]+'
+        #return t
 
     def t_error(self, t):
         print("Illegal character '%s'" % t.value[0])
         t.lexer.skip(1)
 
-    # Parsing rules
+    ## Parsing rules
 
-    def p_integer(self, p):
-        '''integer : decint
-                   | binint
-                   | octint
-                   | hexint
-        '''
-        p[0] = p[1]
+    #def p_integer(self, p):
+        #'''integer : decint
+                   #| binint
+                   #| octint
+                   #| hexint
+        #'''
+        #p[0] = p[1]
 
-    def p_float(self, p):
-        '''float : pointfloat
-               | exponentfloat
-        '''
-        p[0] = p[1]
+    #def p_float(self, p):
+        #'''float : pointfloat
+               #| exponentfloat
+        #'''
+        #p[0] = p[1]
 
-    def p_statement(self, p):
-        '''statement : ident
-                   | string
-                   | integer
-                   | float
-        '''
-        print p[1]
+    #def p_statement(self, p):
+        #'''statement : ident
+                   #| string
+                   #| integer
+                   #| float
+        #'''
+        #print p[1]
 
-    def p_error(self, p):
-        if p:
-            print("Syntax error at '%s'" % p.value)
-        else:
-            print("Syntax error at EOF")
+    #def p_error(self, p):
+        #if p:
+            #print("Syntax error at '%s'" % p.value)
+        #else:
+            #print("Syntax error at EOF")
 
 if __name__ == '__main__':
     calc = Calc(debug=1)
