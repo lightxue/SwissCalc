@@ -125,6 +125,101 @@ class LexTest(unittest.TestCase):
         self.assertEqual(tok.type, 'exponentfloat')
         self.assertEqual(tok.value, 123e123)
 
+    def test_operator(self):
+        calc = swisscalc.Calc()
+
+        # numeric operator
+
+        tok = calc._lexme('+')[0]
+        self.assertEqual(tok.type, 'add')
+
+        tok = calc._lexme('-')[0]
+        self.assertEqual(tok.type, 'subtract')
+
+        tok = calc._lexme('*')[0]
+        self.assertEqual(tok.type, 'multiply')
+
+        tok = calc._lexme('/')[0]
+        self.assertEqual(tok.type, 'divide')
+
+        tok = calc._lexme('%')[0]
+        self.assertEqual(tok.type, 'modulo')
+
+        tok = calc._lexme('**')[0]
+        self.assertEqual(tok.type, 'exponent')
+
+        tok = calc._lexme('!')[0]
+        self.assertEqual(tok.type, 'factorial')
+
+        # bit operator
+
+        tok = calc._lexme('<<')[0]
+        self.assertEqual(tok.type, 'lshift')
+
+        tok = calc._lexme('>>')[0]
+        self.assertEqual(tok.type, 'rshift')
+
+        tok = calc._lexme('&')[0]
+        self.assertEqual(tok.type, 'and')
+
+        tok = calc._lexme('~')[0]
+        self.assertEqual(tok.type, 'not')
+
+        tok = calc._lexme('|')[0]
+        self.assertEqual(tok.type, 'or')
+
+        tok = calc._lexme('^')[0]
+        self.assertEqual(tok.type, 'xor')
+
+    def test_delimiter(self):
+        calc = swisscalc.Calc()
+        tok = calc._lexme('=')[0]
+        self.assertEqual(tok.type, 'assign')
+
+        tok = calc._lexme('+=')[0]
+        self.assertEqual(tok.type, 'addassign')
+
+        tok = calc._lexme('-=')[0]
+        self.assertEqual(tok.type, 'subassign')
+
+        tok = calc._lexme('*=')[0]
+        self.assertEqual(tok.type, 'mulassign')
+
+        tok = calc._lexme('/=')[0]
+        self.assertEqual(tok.type, 'divassign')
+
+        tok = calc._lexme('%=')[0]
+        self.assertEqual(tok.type, 'modassign')
+
+        tok = calc._lexme('**=')[0]
+        self.assertEqual(tok.type, 'expassign')
+
+        tok = calc._lexme('<<=')[0]
+        self.assertEqual(tok.type, 'lsftassign')
+
+        tok = calc._lexme('>>=')[0]
+        self.assertEqual(tok.type, 'rsftassign')
+
+        tok = calc._lexme('&=')[0]
+        self.assertEqual(tok.type, 'andassign')
+
+        tok = calc._lexme('~=')[0]
+        self.assertEqual(tok.type, 'notassign')
+
+        tok = calc._lexme('|=')[0]
+        self.assertEqual(tok.type, 'orassign')
+
+        tok = calc._lexme('^=')[0]
+        self.assertEqual(tok.type, 'xorassign')
+
+        tok = calc._lexme('(')[0]
+        self.assertEqual(tok.type, 'lparen')
+
+        tok = calc._lexme(')')[0]
+        self.assertEqual(tok.type, 'rparen')
+
+        tok = calc._lexme(',')[0]
+        self.assertEqual(tok.type, 'comma')
 
 if __name__ == "__main__":
     unittest.main()

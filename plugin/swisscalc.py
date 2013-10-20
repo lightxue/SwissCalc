@@ -76,6 +76,15 @@ class Calc(Parser):
         'binint', 'octint', 'hexint', 'decint',
         'string',
         'pointfloat', 'exponentfloat',
+        'add', 'subtract', 'multiply', 'divide',
+        'modulo', 'exponent', 'factorial',
+        'lshift', 'rshift', 'and', 'not', 'or', 'xor',
+        'assign',
+        'addassign', 'subassign', 'mulassign', 'divassign',
+        'modassign', 'expassign',
+        'lsftassign', 'rsftassign',
+        'andassign', 'notassign', 'orassign', 'xorassign',
+        'lparen', 'rparen', 'comma',
     )
 
     # Tokens
@@ -83,6 +92,43 @@ class Calc(Parser):
     #t_keyword = r''
     t_ignore = ' \t'
     t_ident = r'[a-zA-Z_][a-zA-Z0-9_]*'
+
+    # numeric operator
+    t_add        = r'\+'
+    t_subtract   = r'-'
+    t_multiply   = r'\*'
+    t_divide     = r'/'
+    t_modulo     = r'%'
+    t_exponent   = r'\*\*'
+    t_factorial  = r'!'
+
+    # bit operator
+    t_lshift     = r'<<'
+    t_rshift     = r'>>'
+    t_and        = r'&'
+    t_not        = r'~'
+    t_or         = r'\|'
+    t_xor        = r'\^'
+
+    # delimiter
+    t_assign     = r'='
+    t_addassign  = r'\+='
+    t_subassign  = r'-='
+    t_mulassign  = r'\*='
+    t_divassign  = r'/='
+    t_modassign  = r'%='
+    t_expassign  = r'\*\*='
+
+    t_lsftassign = r'<<='
+    t_rsftassign = r'>>='
+    t_andassign  = r'&='
+    t_notassign  = r'~='
+    t_orassign   = r'\|='
+    t_xorassign  = r'\^='
+
+    t_lparen     = r'\('
+    t_rparen     = r'\)'
+    t_comma      = r','
 
     def t_newline(self, t):
         r'\n+'
