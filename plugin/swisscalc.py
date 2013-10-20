@@ -66,7 +66,6 @@ class Parser(object):
             except EOFError:
                 break
             for tok in self._lexme(s):
-                print tok.type, tok.value
                 print tok
 
 
@@ -76,6 +75,7 @@ class Calc(Parser):
         'newline',
         'binint', 'octint', 'hexint', 'decint',
         'string',
+        'pointfloat', 'exponentfloat',
     )
 
     # Tokens
@@ -101,6 +101,16 @@ class Calc(Parser):
             t.value = t.value[1:-1].decode('string-escape')
         return t
 
+    def t_exponentfloat(self, t):
+        r'[0-9]+(\.[0-9]+)?[eE][+-]?[0-9]+'
+        t.value = float(t.value)
+        return t
+
+    def t_pointfloat(self, t):
+        r'[0-9]+\.[0-9]+'
+        t.value = float(t.value)
+        return t
+
     def t_binint(self, t):
         r'0[bB][01]+'
         t.value = int(t.value, 2)
@@ -120,15 +130,6 @@ class Calc(Parser):
         r'[1-9][0-9]*|0'
         t.value = int(t.value)
         return t
-
-    #def t_pointfloat(self, t):
-        #r'[0-9]+.[0-9]+'
-        #return t
-
-    #def t_exponentfloat(self, t):
-        #r'[0-9](.[0-9]+)?[eE][+-]?[0-9]+'
-        #return t
-
     def t_error(self, t):
         print("Illegal character '%s'" % t.value[0])
         t.lexer.skip(1)

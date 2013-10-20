@@ -93,6 +93,38 @@ class LexTest(unittest.TestCase):
         self.assertEqual(tok.type, 'string')
         self.assertEqual(tok.value, "\"\n")
 
+    def test_pointfloat(self):
+        calc = swisscalc.Calc()
+        tok = calc._lexme('3.14')[0]
+        self.assertEqual(tok.type, 'pointfloat')
+        self.assertEqual(tok.value, 3.14)
+
+        tok = calc._lexme('0.0001')[0]
+        self.assertEqual(tok.type, 'pointfloat')
+        self.assertEqual(tok.value, 0.0001)
+
+        tok = calc._lexme('003.14')[0]
+        self.assertEqual(tok.type, 'pointfloat')
+        self.assertEqual(tok.value, 003.14)
+
+    def test_exponentfloat(self):
+        calc = swisscalc.Calc()
+        tok = calc._lexme('0e0')[0]
+        self.assertEqual(tok.type, 'exponentfloat')
+        self.assertEqual(tok.value, 0e0)
+
+        tok = calc._lexme('3.14e-10')[0]
+        self.assertEqual(tok.type, 'exponentfloat')
+        self.assertEqual(tok.value, 3.14e-10)
+
+        tok = calc._lexme('1.141e+10')[0]
+        self.assertEqual(tok.type, 'exponentfloat')
+        self.assertEqual(tok.value, 1.141e+10)
+
+        tok = calc._lexme('123e123')[0]
+        self.assertEqual(tok.type, 'exponentfloat')
+        self.assertEqual(tok.value, 123e123)
+
 
 if __name__ == "__main__":
     unittest.main()
