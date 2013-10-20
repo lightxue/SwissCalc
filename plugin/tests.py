@@ -66,9 +66,33 @@ class LexTest(unittest.TestCase):
         self.assertEqual(tok.type, 'hexint')
         self.assertEqual(tok.value, 0xdeadbeef)
 
-if __name__ == "__main__":
-    unittest.main()
-if __name__ == "__main__":
-    unittest.main()
+    def test_string(self):
+        calc = swisscalc.Calc()
+
+        tok = calc._lexme(r"""'hello'""")[0]
+        self.assertEqual(tok.type, 'string')
+        self.assertEqual(tok.value, 'hello')
+
+        tok = calc._lexme(r'"world"')[0]
+        self.assertEqual(tok.type, 'string')
+        self.assertEqual(tok.value, "world")
+
+        tok = calc._lexme(r"""'\'\n'""")[0]
+        self.assertEqual(tok.type, 'string')
+        self.assertEqual(tok.value, '\'\n')
+
+        tok = calc._lexme(r"""r'\'\n'""")[0]
+        self.assertEqual(tok.type, 'string')
+        self.assertEqual(tok.value, r'\'\n')
+
+        tok = calc._lexme(r"""R'\'\n'""")[0]
+        self.assertEqual(tok.type, 'string')
+        self.assertEqual(tok.value, R'\'\n')
+
+        tok = calc._lexme(r'"\"\n"')[0]
+        self.assertEqual(tok.type, 'string')
+        self.assertEqual(tok.value, "\"\n")
+
+
 if __name__ == "__main__":
     unittest.main()

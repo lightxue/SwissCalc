@@ -69,11 +69,13 @@ class Parser(object):
                 print tok.type, tok.value
                 print tok
 
+
 class Calc(Parser):
     tokens = (
         'ident',
         'newline',
         'binint', 'octint', 'hexint', 'decint',
+        'string',
     )
 
     # Tokens
@@ -86,14 +88,18 @@ class Calc(Parser):
         r'\n+'
         t.lexer.lineno += t.value.count("\n")
 
-    #_escapeseq = r'\\.'
-    #_stringchar = (r"[^\\']", r'[^\\"]')
-    #_singlequote = "'(%s|%s)*'" % (_escapeseq, _stringchar[0])
-    #_doublequote = "'(%s|%s)*'" % (_escapeseq, _stringchar[1])
-    #def t_string(self, t):
-        #'hello'
-        ##__doc__ == r'[rR](%s)|(%s)' % (self._singlequote, self._doublequote)
-        #return t
+    _escapeseq = r'\\.'
+    _stringchar = (r"[^\\']", r'[^\\"]')
+    _singlequote = "'(%s|%s)*'" % (_escapeseq, _stringchar[0])
+    _doublequote = '"(%s|%s)*"' % (_escapeseq, _stringchar[1])
+    _string = r'[rR]?((%s)|(%s))' % (_singlequote, _doublequote)
+    @TOKEN(_string)
+    def t_string(self, t):
+        if t.value[0] in 'rR':
+            t.value = t.value[2:-1]
+        else:
+            t.value = t.value[1:-1].decode('string-escape')
+        return t
 
     def t_binint(self, t):
         r'0[bB][01]+'
