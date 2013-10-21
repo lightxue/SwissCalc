@@ -37,10 +37,10 @@ class Parser(object):
 
         # Build the lexer and parser
         self.lexer = lex.lex(module=self, debug=self.debug)
-        #yacc.yacc(module=self,
-                  #debug=self.debug,
-                  #debugfile=self.debugfile,
-                  #tabmodule=self.tabmodule)
+        yacc.yacc(module=self,
+                  debug=self.debug,
+                  debugfile=self.debugfile,
+                  tabmodule=self.tabmodule)
 
     def execute(self, s):
         if not s:
@@ -182,35 +182,84 @@ class Calc(Parser):
 
     ## Parsing rules
 
-    #def p_integer(self, p):
-        #'''integer : decint
-                   #| binint
-                   #| octint
-                   #| hexint
-        #'''
-        #p[0] = p[1]
+    precedence = (
+        ('left','add','subtract'),
+        ('left','multiply','divide'),
+        ('left', 'power'),
+        ('right','uminus'),
+        )
 
-    #def p_float(self, p):
-        #'''float : pointfloat
-               #| exponentfloat
-        #'''
-        #p[0] = p[1]
+    def p_statement_ident(self, p):
+        '''statement : ident'''
+        print(self.names[p[1]])
 
-    #def p_statement(self, p):
-        #'''statement : ident
-                   #| string
-                   #| integer
-                   #| float
-        #'''
-        #print p[1]
+    def p_statement_expr(self, p):
+        '''statement : expression'''
+        print(p[1])
 
-    #def p_error(self, p):
-        #if p:
-            #print("Syntax error at '%s'" % p.value)
-        #else:
-            #print("Syntax error at EOF")
+    def p_statement_assign(self, p):
+        '''statement : ident assign expression'''
+        self.names[p[1]] = p[3]
+
+    def p_expression_binop(self, p):
+        '''
+        expression : expression add expression
+                   | expression subtract expression
+                   | expression multiply expression
+                   | expression divide expression
+                   | expression power expression
+        '''
+        if   p[2] == '+'  : p[0] = p[1] + p[3]
+        elif p[2] == '-'  : p[0] = p[1] - p[3]
+        elif p[2] == '*'  : p[0] = p[1] * p[3]
+        elif p[2] == '/'  : p[0] = p[1] / p[3]
+        elif p[2] == '**' : p[0] = p[1] ** p[3]
+
+    def p_expression_uminus(self, p):
+        'expression : subtract expression %prec uminus'
+        p[0] = -p[2]
+
+    def p_expression_group(self, p):
+        'expression : lparen expression rparen'
+        p[0] = p[2]
+
+    def p_expression_number(self, p):
+        '''
+        expression : integer
+                   | float
+        '''
+        p[0] = p[1]
+
+    def p_expression_name(self, p):
+        'expression : ident'
+        try:
+            p[0] = self.names[p[1]]
+        except LookupError:
+            print("Undefined name '%s'" % p[1])
+            p[0] = 0
+
+    def p_integer(self, p):
+        '''integer : decint
+                   | binint
+                   | octint
+                   | hexint
+        '''
+        p[0] = p[1]
+
+    def p_float(self, p):
+        '''float : pointfloat
+                 | exponentfloat
+        '''
+        p[0] = p[1]
+
+    def p_error(self, p):
+        if p:
+            print("Syntax error at '%s'" % p.value)
+        else:
+            print("Syntax error at EOF")
 
 if __name__ == '__main__':
     calc = Calc(debug=1)
     #calc = Parser()
-    calc._runlex()
+    #calc._runlex()
+    calc.run()
