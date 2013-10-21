@@ -15,6 +15,7 @@ import ply.lex as lex
 from ply.lex import TOKEN
 import ply.yacc as yacc
 import os
+import math
 
 class Parser(object):
     """
@@ -183,15 +184,20 @@ class Calc(Parser):
     ## Parsing rules
 
     precedence = (
-        ('left','add','subtract'),
-        ('left','multiply','divide'),
+        ('left', 'or'),
+        ('left', 'xor'),
+        ('left', 'and'),
+        ('left', 'lshift', 'rshift'),
+        ('left', 'add', 'subtract'),
+        ('left', 'multiply', 'divide', 'modulo'),
+        ('right','usub', 'uadd', 'not'),
+        ('left', 'factorial'),
         ('left', 'power'),
-        ('right','uminus'),
         )
 
-    def p_statement_ident(self, p):
-        '''statement : ident'''
-        print(self.names[p[1]])
+    #def p_statement_ident(self, p):
+        #'''statement : ident'''
+        #print(self.names[p[1]])
 
     def p_statement_expr(self, p):
         '''statement : expression'''
@@ -207,6 +213,12 @@ class Calc(Parser):
                    | expression subtract expression
                    | expression multiply expression
                    | expression divide expression
+                   | expression or expression
+                   | expression xor expression
+                   | expression and expression
+                   | expression lshift expression
+                   | expression rshift expression
+                   | expression modulo expression
                    | expression power expression
         '''
         if   p[2] == '+'  : p[0] = p[1] + p[3]
@@ -214,10 +226,26 @@ class Calc(Parser):
         elif p[2] == '*'  : p[0] = p[1] * p[3]
         elif p[2] == '/'  : p[0] = p[1] / p[3]
         elif p[2] == '**' : p[0] = p[1] ** p[3]
+        elif p[2] == '|'  : p[0] = p[1] | p[3]
+        elif p[2] == '^'  : p[0] = p[1] ^ p[3]
+        elif p[2] == '&'  : p[0] = p[1] & p[3]
+        elif p[2] == '<<'  : p[0] = p[1] << p[3]
+        elif p[2] == '>>'  : p[0] = p[1] >> p[3]
+        elif p[2] == '%'  : p[0] = p[1] % p[3]
 
-    def p_expression_uminus(self, p):
-        'expression : subtract expression %prec uminus'
-        p[0] = -p[2]
+    def p_expression_unary(self, p):
+        '''expression : subtract expression %prec usub
+                      | add expression %prec uadd
+                      | not expression
+        '''
+        if    p[1] == '-' : p[0] = -p[2]
+        elif  p[1] == '+' : p[0] =  p[2]
+        elif  p[1] == '~' : p[0] = ~p[2]
+
+    def p_expression_factorial(self, p):
+        '''expression : expression factorial
+        '''
+        p[0] = math.factorial(p[1])
 
     def p_expression_group(self, p):
         'expression : lparen expression rparen'
