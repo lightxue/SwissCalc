@@ -27,7 +27,8 @@ class Parser(object):
 
     def __init__(self, **kw):
         self.debug = kw.get('debug', 0)
-        self.names = { }
+        self.names = {}
+        self.lineno = 0
         try:
             modname = os.path.split(os.path.splitext(__file__)[0])[1] +\
                     "_" + self.__class__.__name__
@@ -177,8 +178,9 @@ class Calc(Parser):
         r'[1-9][0-9]*|0'
         t.value = int(t.value)
         return t
+
     def t_error(self, t):
-        print("Illegal character '%s'" % t.value[0])
+        print("Illegal character '%s' in %d line" % (t.value[0], t.lexer.lineno))
         t.lexer.skip(1)
 
     ## Parsing rules
@@ -203,8 +205,26 @@ class Calc(Parser):
         '''statement : expression'''
         print(p[1])
 
+    def p_statement_newline(self, p):
+        '''statement : newline'''
+        self.lineno += 1
+
     def p_statement_assign(self, p):
-        '''statement : ident assign expression'''
+        '''
+        statement : ident assign     expression
+                  | ident addassign  expression
+                  | ident subassign  expression
+                  | ident mulassign  expression
+                  | ident divassign  expression
+                  | ident modassign  expression
+                  | ident powassign  expression
+                  | ident lsftassign expression
+                  | ident rsftassign expression
+                  | ident andassign  expression
+                  | ident notassign  expression
+                  | ident orassign   expression
+                  | ident xorassign  expression
+        '''
         self.names[p[1]] = p[3]
 
     def p_expression_binop(self, p):
@@ -229,8 +249,8 @@ class Calc(Parser):
         elif p[2] == '|'  : p[0] = p[1] | p[3]
         elif p[2] == '^'  : p[0] = p[1] ^ p[3]
         elif p[2] == '&'  : p[0] = p[1] & p[3]
-        elif p[2] == '<<'  : p[0] = p[1] << p[3]
-        elif p[2] == '>>'  : p[0] = p[1] >> p[3]
+        elif p[2] == '<<' : p[0] = p[1] << p[3]
+        elif p[2] == '>>' : p[0] = p[1] >> p[3]
         elif p[2] == '%'  : p[0] = p[1] % p[3]
 
     def p_expression_unary(self, p):
@@ -247,6 +267,31 @@ class Calc(Parser):
         '''
         p[0] = math.factorial(p[1])
 
+    def p_expression_func(self, p):
+        'expression : function'
+        p[0] = p[1]
+
+    def p_func_with_args(self, p):
+        'function : ident lparen arguments rparen'
+        p[0] = 'debug function: %s(%s)' % (p[1], str(p[3]))
+
+    def p_func_without_args(self, p):
+        'function : ident lparen rparen'
+        p[0] = 'debug function: %s' % p[1]
+
+    def p_arguments_plural(self, p):
+        '''
+        arguments : expression comma arguments
+        '''
+        p[0] = p[3][:]
+        p[0].insert(0, p[1])
+
+    def p_arguments_single(self, p):
+        '''
+        arguments : expression
+        '''
+        p[0] = [p[1]]
+
     def p_expression_group(self, p):
         'expression : lparen expression rparen'
         p[0] = p[2]
@@ -255,6 +300,7 @@ class Calc(Parser):
         '''
         expression : integer
                    | float
+                   | string
         '''
         p[0] = p[1]
 
@@ -282,7 +328,7 @@ class Calc(Parser):
 
     def p_error(self, p):
         if p:
-            print("Syntax error at '%s'" % p.value)
+            print("Syntax error at '%s' in %d line" % (p.value, self.lineno))
         else:
             print("Syntax error at EOF")
 
