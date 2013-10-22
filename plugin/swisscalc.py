@@ -24,10 +24,11 @@ class Parser(object):
     tokens = ()
     precedence = ()
 
-
     def __init__(self, **kw):
         self.debug = kw.get('debug', 0)
         self.names = {}
+        self.funcs = {var : getattr(math, var)
+                      for var in dir(math) if callable(getattr(math, var))}
         self.lineno = 0
         try:
             modname = os.path.split(os.path.splitext(__file__)[0])[1] +\
@@ -273,11 +274,17 @@ class Calc(Parser):
 
     def p_func_with_args(self, p):
         'function : ident lparen arguments rparen'
-        p[0] = 'debug function: %s(%s)' % (p[1], str(p[3]))
+        if p[1] in self.funcs:
+            p[0] = self.funcs[p[1]](*p[3])
+        else:
+            print('function: %s not found' % p[1])
 
     def p_func_without_args(self, p):
         'function : ident lparen rparen'
-        p[0] = 'debug function: %s' % p[1]
+        if p[1] in self.funcs:
+            p[0] = self.funcs[p[1]]()
+        else:
+            print('function: %s not found' % p[1])
 
     def p_arguments_plural(self, p):
         '''
@@ -333,7 +340,7 @@ class Calc(Parser):
             print("Syntax error at EOF")
 
 if __name__ == '__main__':
-    calc = Calc(debug=1)
+    calc = Calc(debug=0)
     #calc = Parser()
     #calc._runlex()
     calc.run()
