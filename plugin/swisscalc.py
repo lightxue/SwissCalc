@@ -86,7 +86,7 @@ class Calc(Parser):
         'addassign', 'subassign', 'mulassign', 'divassign',
         'modassign', 'powassign',
         'lsftassign', 'rsftassign',
-        'andassign', 'notassign', 'orassign', 'xorassign',
+        'andassign', 'orassign', 'xorassign',
         'lparen', 'rparen', 'comma',
     )
 
@@ -125,7 +125,6 @@ class Calc(Parser):
     t_lsftassign = r'<<='
     t_rsftassign = r'>>='
     t_andassign  = r'&='
-    t_notassign  = r'~='
     t_orassign   = r'\|='
     t_xorassign  = r'\^='
 
@@ -204,7 +203,12 @@ class Calc(Parser):
 
     def p_statement_expr(self, p):
         '''statement : expression'''
-        print(p[1])
+        if p[1] is None:
+            return
+        if not self._env['float']:
+            p[1] = self.truncint(p[1])
+        self.names['_'] = p[1]
+        print self.repr_result(p[1])
 
     def p_statement_newline(self, p):
         '''statement : newline'''
@@ -222,11 +226,25 @@ class Calc(Parser):
                   | ident lsftassign expression
                   | ident rsftassign expression
                   | ident andassign  expression
-                  | ident notassign  expression
                   | ident orassign   expression
                   | ident xorassign  expression
         '''
-        self.names[p[1]] = p[3]
+        if   p[2] == '='   : self.names[p[1]] =   p[3]
+        elif p[2] == '+='  : self.names[p[1]] +=  p[3]
+        elif p[2] == '-='  : self.names[p[1]] -=  p[3]
+        elif p[2] == '*='  : self.names[p[1]] *=  p[3]
+        elif p[2] == '/='  : self.names[p[1]] /=  p[3]
+        elif p[2] == '%='  : self.names[p[1]] %=  p[3]
+        elif p[2] == '**=' : self.names[p[1]] **= p[3]
+        elif p[2] == '<<=' : self.names[p[1]] <<= p[3]
+        elif p[2] == '>>=' : self.names[p[1]] >>= p[3]
+        elif p[2] == '&='  : self.names[p[1]] &=  p[3]
+        elif p[2] == '|='  : self.names[p[1]] |=  p[3]
+        elif p[2] == '^='  : self.names[p[1]] ^=  p[3]
+        if not self._env['float']:
+            self.name[p[1]] = self.truncint(self.name[p[1]])
+
+        print self.repr_kv(p[1], self.names[p[1]])
 
     def p_expression_binop(self, p):
         '''
@@ -303,18 +321,32 @@ class Calc(Parser):
         'expression : lparen expression rparen'
         p[0] = p[2]
 
+    def p_expression_str(self, p):
+        '''
+        expression : string
+        '''
+        p[0] = p[1]
+
     def p_expression_number(self, p):
         '''
         expression : integer
                    | float
-                   | string
         '''
-        p[0] = p[1]
+        if self._env['float']:
+            p[0] = float(p[1])
+        else:
+            p[0] = int(p[1])
 
     def p_expression_name(self, p):
         'expression : ident'
         try:
             p[0] = self.names[p[1]]
+            if isinstance(p[0], str):
+                pass
+            elif self._env['float']:
+                p[0] = float(p[0])
+            else:
+                p[0] = int(p[0])
         except LookupError:
             print("Undefined name '%s'" % p[1])
             p[0] = 0
@@ -339,8 +371,82 @@ class Calc(Parser):
         else:
             print("Syntax error at EOF")
 
+    # Misc
+    def __init__(self, **kw):
+        super(Calc, self).__init__(**kw)
+        self.funcs['vars'] = self.show_names
+        self.funcs['env'] = self.env
+        self.funcs['setenv'] = self.setenv
+        # _ store last result, just like interactive python interpreter
+        self.names['_'] = 0
+        self.names['pi'] = math.pi
+        self.names['e'] = math.e
+        self._env = {
+            'float'  : 0,
+            'signed' : 1,
+            'word'   : 8,
+            'bin'    : 1,
+            'oct'    : 1,
+            'dec'    : 1,
+            'hex'    : 1,
+        }
+
+    def bin_int(self, integer):
+        length = 8 * self._env['word']
+        s = '{0:0{width}b}'.format(integer, width=length)
+        r = [s[i:i+8] for i in xrange(0, len(s), 8)]
+        r = [r[i:i+4] for i in xrange(0, len(r), 4)]
+        return '\n'.join(' '.join(line) for line in r)
+
+    def oct_int(self, integer):
+        return '{0:o}'.format(integer)
+
+    def hex_int(self, integer):
+        length = 2 * self._env['word']
+        s = '{0:0{width}x}'.format(integer, width=length)
+        r = [s[i:i+2] for i in xrange(0, len(s), 2)]
+        r = [r[i:i+4] for i in xrange(0, len(r), 4)]
+        return '\n'.join(' '.join(line) for line in r)
+
+    def repr_result(self, result):
+        if isinstance(result, str) or isinstance(result, float):
+            return repr(result)
+        res = []
+        if self._env['bin']:
+            res.append(self.bin_int(result))
+        if self._env['oct']:
+            res.append(self.oct_int(result))
+        if self._env['dec']:
+            res.append(repr(result))
+        if self._env['hex']:
+            res.append(self.hex_int(result))
+        return '\n'.join(res)
+
+    def repr_kv(self, key, val):
+        return '%s = %s' % (key, repr(val))
+
+    def show_names(self):
+        for name, value in self.names.iteritems():
+            print self.repr_kv(name, value)
+
+    def env(self):
+        names = self._env.keys()
+        names.sort(key=len)
+        for name in names:
+            print self.repr_kv(name.rjust(10), self._env[name])
+
+    def setenv(self, name, value):
+        self._env[name] = int(value)
+
+    def truncint(self, val):
+        try:
+            val = int(val)
+            signed = bool(self._env['signed'])
+            bits = 1 << (self._env['word'] * 8)
+            return (val & (bits - 1)) - bool(val & (bits >> 1)) * signed * bits
+        except ValueError:
+            return val
+
 if __name__ == '__main__':
     calc = Calc(debug=0)
-    #calc = Parser()
-    #calc._runlex()
     calc.run()
