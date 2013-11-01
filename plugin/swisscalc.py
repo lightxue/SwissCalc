@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# author:  lightxue
-# email:   bkmgtp@gmail.com
-# version: 0.01
-# website: https://github.com/lightxue/SwissCalc
+# Author:  lightxue
+# Email:   bkmgtp@gmail.com
+# Version: 0.01
+# Website: https://github.com/lightxue/SwissCalc
 
 import sys
 
@@ -32,6 +32,7 @@ class Parser(object):
         self.names = {}
         self.funcs = {}
         self.lineno = 0
+        self.excval = ''
         try:
             modname = os.path.split(os.path.splitext(__file__)[0])[1] +\
                       "_" + self.__class__.__name__
@@ -51,7 +52,9 @@ class Parser(object):
         if not s:
             return
         try:
+            self.excval = ''
             yacc.parse(s)
+            return self.excval
         except Exception, err:
             raise
             print('exception: %s' % err)
@@ -63,7 +66,9 @@ class Parser(object):
                 s = raw_input('calc > ')
             except EOFError:
                 break
-            self.execute(s)
+            val = self.execute(s)
+            if val:
+                print val
 
     def _lexme(self, s):
         self.lexer.input(s)
@@ -211,7 +216,7 @@ class Calc(Parser):
         if isinstance(p[1], int):
             p[1] = self.truncint(p[1])
         self.names['_'] = p[1]
-        print self.repr_result(p[1])
+        self.excval = self.repr_result(p[1])
 
     def p_statement_newline(self, p):
         '''statement : newline'''
@@ -267,7 +272,7 @@ class Calc(Parser):
         var = self.names[p[1]]
         if p[2] == '/=':
             var = self.common_binops[p[2]](var, float(p[3]))
-        elif p[2] in self.common_binop:
+        elif p[2] in self.common_binops:
             var = self.common_binops[p[2]](var, p[3])
         else:
             var = self.common_binops[p[2]](int(var), int(p[3]))
