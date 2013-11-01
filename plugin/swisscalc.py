@@ -50,7 +50,12 @@ class Parser(object):
     def execute(self, s):
         if not s:
             return
-        yacc.parse(s)
+        try:
+            yacc.parse(s)
+        except Exception, err:
+            raise
+            print('exception: %s' % err)
+
 
     def run(self):
         while 1:
@@ -256,9 +261,10 @@ class Calc(Parser):
                   | ident orassign   expression
                   | ident xorassign  expression
         '''
-        var = self.names[p[1]]
         if p[2] == '=':
-            var = p[3]
+            self.names[p[1]] = p[3]
+            return
+        var = self.names[p[1]]
         if p[2] == '/=':
             var = self.common_binops[p[2]](var, float(p[3]))
         elif p[2] in self.common_binop:
@@ -397,10 +403,10 @@ class Calc(Parser):
             'float'  : 1,
             'signed' : 1,
             'word'   : 4,
-            'bin'    : 1,
-            'oct'    : 1,
+            'bin'    : 0,
+            'oct'    : 0,
             'dec'    : 1,
-            'hex'    : 1,
+            'hex'    : 0,
         }
 
     def bin_int(self, integer):
