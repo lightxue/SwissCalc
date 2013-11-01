@@ -16,6 +16,9 @@ from ply.lex import TOKEN
 import ply.yacc as yacc
 import os
 import math
+import operator
+import builtin_funcs
+import custom_funcs
 
 class Parser(object):
     """
@@ -27,12 +30,11 @@ class Parser(object):
     def __init__(self, **kw):
         self.debug = kw.get('debug', 0)
         self.names = {}
-        self.funcs = {var : getattr(math, var)
-                      for var in dir(math) if callable(getattr(math, var))}
+        self.funcs = {}
         self.lineno = 0
         try:
             modname = os.path.split(os.path.splitext(__file__)[0])[1] +\
-                    "_" + self.__class__.__name__
+                      "_" + self.__class__.__name__
         except:
             modname = "parser" + "_" + self.__class__.__name__
         self.debugfile = modname + ".dbg"
@@ -197,15 +199,11 @@ class Calc(Parser):
         ('left', 'power'),
         )
 
-    #def p_statement_ident(self, p):
-        #'''statement : ident'''
-        #print(self.names[p[1]])
-
     def p_statement_expr(self, p):
         '''statement : expression'''
         if p[1] is None:
             return
-        if not self._env['float']:
+        if isinstance(p[1], int):
             p[1] = self.truncint(p[1])
         self.names['_'] = p[1]
         print self.repr_result(p[1])
@@ -213,6 +211,35 @@ class Calc(Parser):
     def p_statement_newline(self, p):
         '''statement : newline'''
         self.lineno += 1
+
+    common_binops = {
+        '+'   : operator.add,
+        '-'   : operator.sub,
+        '*'   : operator.mul,
+        '/'   : operator.div,
+        '%'   : operator.mod,
+        '**'  : operator.pow,
+        '+='  : operator.iadd,
+        '-='  : operator.isub,
+        '*='  : operator.imul,
+        '/='  : operator.idiv,
+        '%='  : operator.imod,
+        '**=' : operator.ipow,
+    }
+
+    int_binops = {
+        '<<'  : operator.lshift,
+        '>>'  : operator.rshift,
+        '&'   : operator.and_,
+        '~'   : operator.inv,
+        '|'   : operator.or_,
+        '^'   : operator.xor,
+        '<<=' : operator.ilshift,
+        '>>=' : operator.irshift,
+        '&='  : operator.and_,
+        '|='  : operator.or_,
+        '^='  : operator.xor,
+    }
 
     def p_statement_assign(self, p):
         '''
@@ -229,22 +256,15 @@ class Calc(Parser):
                   | ident orassign   expression
                   | ident xorassign  expression
         '''
-        if   p[2] == '='   : self.names[p[1]] =   p[3]
-        elif p[2] == '+='  : self.names[p[1]] +=  p[3]
-        elif p[2] == '-='  : self.names[p[1]] -=  p[3]
-        elif p[2] == '*='  : self.names[p[1]] *=  p[3]
-        elif p[2] == '/='  : self.names[p[1]] /=  p[3]
-        elif p[2] == '%='  : self.names[p[1]] %=  p[3]
-        elif p[2] == '**=' : self.names[p[1]] **= p[3]
-        elif p[2] == '<<=' : self.names[p[1]] <<= p[3]
-        elif p[2] == '>>=' : self.names[p[1]] >>= p[3]
-        elif p[2] == '&='  : self.names[p[1]] &=  p[3]
-        elif p[2] == '|='  : self.names[p[1]] |=  p[3]
-        elif p[2] == '^='  : self.names[p[1]] ^=  p[3]
-        if not self._env['float']:
-            self.name[p[1]] = self.truncint(self.name[p[1]])
-
-        print self.repr_kv(p[1], self.names[p[1]])
+        var = self.names[p[1]]
+        if p[2] == '=':
+            var = p[3]
+        if p[2] == '/=':
+            var = self.common_binops[p[2]](var, float(p[3]))
+        elif p[2] in self.common_binop:
+            var = self.common_binops[p[2]](var, p[3])
+        else:
+            var = self.common_binops[p[2]](int(var), int(p[3]))
 
     def p_expression_binop(self, p):
         '''
@@ -260,17 +280,12 @@ class Calc(Parser):
                    | expression modulo expression
                    | expression power expression
         '''
-        if   p[2] == '+'  : p[0] = p[1] + p[3]
-        elif p[2] == '-'  : p[0] = p[1] - p[3]
-        elif p[2] == '*'  : p[0] = p[1] * p[3]
-        elif p[2] == '/'  : p[0] = p[1] / p[3]
-        elif p[2] == '**' : p[0] = p[1] ** p[3]
-        elif p[2] == '|'  : p[0] = p[1] | p[3]
-        elif p[2] == '^'  : p[0] = p[1] ^ p[3]
-        elif p[2] == '&'  : p[0] = p[1] & p[3]
-        elif p[2] == '<<' : p[0] = p[1] << p[3]
-        elif p[2] == '>>' : p[0] = p[1] >> p[3]
-        elif p[2] == '%'  : p[0] = p[1] % p[3]
+        if p[2] == '/':
+            p[0] = self.common_binops['/'](p[1], float(p[3]))
+        elif p[2] in self.common_binops:
+            p[0] = self.common_binops[p[2]](p[1], p[3])
+        else:
+            p[0] = self.int_binops[p[2]](int(p[1]), int(p[3]))
 
     def p_expression_unary(self, p):
         '''expression : subtract expression %prec usub
@@ -279,12 +294,12 @@ class Calc(Parser):
         '''
         if    p[1] == '-' : p[0] = -p[2]
         elif  p[1] == '+' : p[0] =  p[2]
-        elif  p[1] == '~' : p[0] = ~p[2]
+        elif  p[1] == '~' : p[0] = ~int(p[2])
 
     def p_expression_factorial(self, p):
         '''expression : expression factorial
         '''
-        p[0] = math.factorial(p[1])
+        p[0] = math.factorial(int(p[1]))
 
     def p_expression_func(self, p):
         'expression : function'
@@ -332,22 +347,14 @@ class Calc(Parser):
         expression : integer
                    | float
         '''
-        if self._env['float']:
-            p[0] = float(p[1])
-        else:
-            p[0] = int(p[1])
+        p[0] = p[1]
 
     def p_expression_name(self, p):
         'expression : ident'
         try:
             p[0] = self.names[p[1]]
-            if isinstance(p[0], str):
-                pass
-            elif self._env['float']:
-                p[0] = float(p[0])
-            else:
-                p[0] = int(p[0])
         except LookupError:
+            # should thorw exception here
             print("Undefined name '%s'" % p[1])
             p[0] = 0
 
@@ -367,13 +374,18 @@ class Calc(Parser):
 
     def p_error(self, p):
         if p:
-            print("Syntax error at '%s' in %d line" % (p.value, self.lineno))
+            print("Syntax error at '%s' in line %d" % (p.value, self.lineno))
         else:
             print("Syntax error at EOF")
 
-    # Misc
+    # Interfacec
     def __init__(self, **kw):
         super(Calc, self).__init__(**kw)
+        self.funcs.update(builtin_funcs.funcs)
+        cusfuncs = {var : getattr(custom_funcs, var)
+                        for var in dir(custom_funcs)
+                            if callable(getattr(custom_funcs, var))}
+        self.funcs.update(cusfuncs)
         self.funcs['vars'] = self.show_names
         self.funcs['env'] = self.env
         self.funcs['setenv'] = self.setenv
@@ -382,9 +394,9 @@ class Calc(Parser):
         self.names['pi'] = math.pi
         self.names['e'] = math.e
         self._env = {
-            'float'  : 0,
+            'float'  : 1,
             'signed' : 1,
-            'word'   : 8,
+            'word'   : 4,
             'bin'    : 1,
             'oct'    : 1,
             'dec'    : 1,
@@ -392,34 +404,43 @@ class Calc(Parser):
         }
 
     def bin_int(self, integer):
-        length = 8 * self._env['word']
+        word = self._env['word']
+        integer &= (1 << word * 8) - 1
+        length = 8 * word
         s = '{0:0{width}b}'.format(integer, width=length)
+        # 8 bits a byte
         r = [s[i:i+8] for i in xrange(0, len(s), 8)]
+        # 4 bytes a line
         r = [r[i:i+4] for i in xrange(0, len(r), 4)]
-        return '\n'.join(' '.join(line) for line in r)
+        return 'bin: ' + '\n     '.join(' '.join(line) for line in r)
 
     def oct_int(self, integer):
-        return '{0:o}'.format(integer)
+        return 'oct: {0:o}'.format(integer)
+
+    def dec_int(slef, integer):
+        return 'dec: %d' % integer
 
     def hex_int(self, integer):
-        length = 2 * self._env['word']
+        word = self._env['word']
+        integer &= (1 << word * 8) - 1
+        length = 2 * word
         s = '{0:0{width}x}'.format(integer, width=length)
+        # 2 digit a byte
         r = [s[i:i+2] for i in xrange(0, len(s), 2)]
+        # 4 bytes a line
         r = [r[i:i+4] for i in xrange(0, len(r), 4)]
-        return '\n'.join(' '.join(line) for line in r)
+        return 'hex: ' + '\n     '.join(' '.join(line) for line in r)
 
     def repr_result(self, result):
         if isinstance(result, str) or isinstance(result, float):
             return repr(result)
+        nsys = [x for x in ('bin', 'oct', 'dec', 'hex') if self._env[x]]
+        if nsys == ['dec']:
+            return repr(result)
         res = []
-        if self._env['bin']:
-            res.append(self.bin_int(result))
-        if self._env['oct']:
-            res.append(self.oct_int(result))
-        if self._env['dec']:
-            res.append(repr(result))
-        if self._env['hex']:
-            res.append(self.hex_int(result))
+        for ns in nsys:
+            func = getattr(self, ns + '_int')
+            res.append(func(result))
         return '\n'.join(res)
 
     def repr_kv(self, key, val):
@@ -439,13 +460,10 @@ class Calc(Parser):
         self._env[name] = int(value)
 
     def truncint(self, val):
-        try:
-            val = int(val)
-            signed = bool(self._env['signed'])
-            bits = 1 << (self._env['word'] * 8)
-            return (val & (bits - 1)) - bool(val & (bits >> 1)) * signed * bits
-        except ValueError:
-            return val
+        val = int(val)
+        signed = int(self._env['signed'] > 0)
+        bits = 1 << (self._env['word'] * 8)
+        return (val & (bits - 1)) - bool(val & (bits >> 1)) * signed * bits
 
 if __name__ == '__main__':
     calc = Calc(debug=0)
