@@ -19,6 +19,9 @@ import math
 import operator
 import builtin_funcs
 import custom_funcs
+import cStringIO
+
+class SyntaxError(Exception): pass
 
 class Parser(object):
     """
@@ -52,12 +55,17 @@ class Parser(object):
         if not s:
             return
         try:
+            sys.stdout = mystdout = cStringIO.StringIO()
             self.excval = ''
             yacc.parse(s)
-            return self.excval
+        except SyntaxError, err:
+            self.excval = 'SyntaxError: %s' % (err)
         except Exception, err:
-            raise
-            print('exception: %s' % err)
+            self.excval = 'RuntimeError: %s' % (err)
+            #raise
+            #print('exception: %s' % err)
+        sys.stdout = sys.__stdout__
+        return mystdout.getvalue() + self.excval
 
 
     def run(self):
@@ -192,8 +200,8 @@ class Calc(Parser):
         return t
 
     def t_error(self, t):
-        print("Illegal character '%s' in %d line" % (t.value[0], t.lexer.lineno))
         t.lexer.skip(1)
+        raise SyntaxError("Illegal character '%s' in %d line" % (t.value[0], t.lexer.lineno))
 
     ## Parsing rules
 
@@ -321,14 +329,14 @@ class Calc(Parser):
         if p[1] in self.funcs:
             p[0] = self.funcs[p[1]](*p[3])
         else:
-            print('function: %s not found' % p[1])
+            raise SyntaxError('function: %s not found' % p[1])
 
     def p_func_without_args(self, p):
         'function : ident lparen rparen'
         if p[1] in self.funcs:
             p[0] = self.funcs[p[1]]()
         else:
-            print('function: %s not found' % p[1])
+            raise SyntaxError('function: %s not found' % p[1])
 
     def p_arguments_plural(self, p):
         '''
@@ -366,8 +374,8 @@ class Calc(Parser):
             p[0] = self.names[p[1]]
         except LookupError:
             # should thorw exception here
-            print("Undefined name '%s'" % p[1])
-            p[0] = 0
+            raise SyntaxError("Undefined name '%s'" % p[1])
+            #p[0] = 0
 
     def p_integer(self, p):
         '''integer : decint
@@ -384,10 +392,11 @@ class Calc(Parser):
         p[0] = p[1]
 
     def p_error(self, p):
-        if p:
-            print("Syntax error at '%s' in line %d" % (p.value, self.lineno))
-        else:
-            print("Syntax error at EOF")
+        raise SyntaxError("Syntax error at '%s'" % (p.value))
+        #if p:
+            #print("Syntax error at '%s' in line %d" % (p.value, self.lineno))
+        #else:
+            #print("Syntax error at EOF")
 
     # Interfacec
     def __init__(self, **kw):
@@ -459,13 +468,13 @@ class Calc(Parser):
 
     def show_names(self):
         for name, value in self.names.iteritems():
-            print self.repr_kv(name, value)
+            print(self.repr_kv(name, value))
 
     def env(self):
         names = self._env.keys()
         names.sort(key=len)
         for name in names:
-            print self.repr_kv(name.rjust(10), self._env[name])
+            print(self.repr_kv(name.rjust(10), self._env[name]))
 
     def setenv(self, name, value):
         self._env[name] = int(value)
