@@ -14,6 +14,8 @@ if exists('g:loaded_swisscalc') || v:version < 700
 endif
 let g:loaded_swisscalc = 1
 
+map <Leader>cl :Calc<CR>
+
 " configurable options
 "
 if !exists("g:SwissCalc_Title")
@@ -102,6 +104,7 @@ function! s:SCalc_SetLocalSettings()
     silent! setlocal bufhidden=delete
     silent! setlocal nonumber
     silent! setlocal nowrap
+    silent! setlocal nolist
     setlocal filetype=swisscalc
 endfunction
 
@@ -143,8 +146,7 @@ function! s:SCalc_REPL(continueInsert)
     endif
 
     call <SID>SCalc_RecordHistory(expr)
-    "TODO: this breaks if a double quoted string is inputed.
-    exe "python repl(\"" . expr . "\")"
+    exe "python repl(''' " . expr . " ''')"
 
     "if executed command don't continue -- may be a ':q'
     if exists("w:vcalc_vim_command")
@@ -231,9 +233,9 @@ import swisscalc
 calc = swisscalc.Calc(debug=0)
 
 def repl(expr):
+    expr = expr.strip()
     if expr != "":
         result = calc.execute(expr)
-        print result
         if not result:
             return
         for str in result.split("\n"):
