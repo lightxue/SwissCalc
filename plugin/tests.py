@@ -203,9 +203,6 @@ class LexTest(unittest.TestCase):
         tok = calc._lexme('&=')[0]
         self.assertEqual(tok.type, 'andassign')
 
-        tok = calc._lexme('~=')[0]
-        self.assertEqual(tok.type, 'notassign')
-
         tok = calc._lexme('|=')[0]
         self.assertEqual(tok.type, 'orassign')
 
@@ -220,6 +217,191 @@ class LexTest(unittest.TestCase):
 
         tok = calc._lexme(',')[0]
         self.assertEqual(tok.type, 'comma')
+
+class yacc(unittest.TestCase):
+    def test_binop(self):
+        calc = swisscalc.Calc()
+
+        ans = calc.execute('3 + 2')
+        self.assertEqual(float(ans), 3 + 2)
+
+        ans = calc.execute('3.5 + 1.1')
+        self.assertEqual(float(ans), 3.5 + 1.1)
+
+        ans = calc.execute('3 * 2')
+        self.assertEqual(float(ans), 3 * 2)
+
+        ans = calc.execute('3.5 * 1.1')
+        self.assertEqual(float(ans), 3.5 * 1.1)
+
+        ans = calc.execute('3 / 2')
+        self.assertEqual(float(ans), 3 / 2.0)
+
+        ans = calc.execute('3.5 / 1.1')
+        self.assertEqual(float(ans), 3.5 / 1.1)
+
+        ans = calc.execute('3 % 2')
+        self.assertEqual(float(ans), 3 % 2)
+
+        ans = calc.execute('3.5 % 1.1')
+        self.assertEqual(float(ans), 3.5 % 1.1)
+
+        ans = calc.execute('3 ** 2')
+        self.assertEqual(float(ans), 3 ** 2)
+
+        ans = calc.execute('3.5 ** 1.1')
+        self.assertEqual(float(ans), 3.5 ** 1.1)
+
+        ans = calc.execute('3 << 2')
+        self.assertEqual(int(ans), 3 << 2)
+
+        ans = calc.execute('3.5 >> 1.1')
+        self.assertEqual(int(ans), 3 >> 1)
+
+        ans = calc.execute('3 >> 2')
+        self.assertEqual(int(ans), 3 >> 2)
+
+        ans = calc.execute('3.5 | 1.1')
+        self.assertEqual(int(ans), 3 | 1)
+
+        ans = calc.execute('3 & 2')
+        self.assertEqual(int(ans), 3 & 2)
+
+        ans = calc.execute('3.5 & 1.1')
+        self.assertEqual(int(ans), 3 & 1)
+
+        ans = calc.execute('3 ^ 2')
+        self.assertEqual(int(ans), 3 ^ 2)
+
+    def test_unaryop(self):
+        calc = swisscalc.Calc()
+
+        ans = calc.execute('8!')
+        self.assertEqual(int(ans),  math.factorial(8))
+
+        ans = calc.execute('8.23!')
+        self.assertEqual(int(ans), math.factorial(8))
+
+        ans = calc.execute('-8')
+        self.assertEqual(int(ans), -8)
+
+        ans = calc.execute('-8.3')
+        self.assertEqual(float(ans), -8.3)
+
+        ans = calc.execute('~8')
+        self.assertEqual(int(ans), ~8)
+
+    def test_assign(self):
+        calc = swisscalc.Calc()
+
+        calc.execute('v = 3')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3)
+
+        calc.execute('v = 3.8')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3.8)
+
+        calc.execute('v = 3')
+        calc.execute('v += 3')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3 + 3)
+
+        calc.execute('v = 3.8')
+        calc.execute('v += 3.8')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3.8 + 3.8)
+
+        calc.execute('v = 3')
+        calc.execute('v -= 3')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3 - 3)
+
+        calc.execute('v = 3.8')
+        calc.execute('v -= 3.8')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3.8 - 3.8)
+
+        calc.execute('v = 3')
+        calc.execute('v *= 3')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3 * 3)
+
+        calc.execute('v = 3.8')
+        calc.execute('v *= 3.8')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3.8 * 3.8)
+
+        calc.execute('v = 3')
+        calc.execute('v /= 3')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3 / 3)
+
+        calc.execute('v = 3.8')
+        calc.execute('v /= 3.8')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3.8 / 3.8)
+
+        calc.execute('v = 3')
+        calc.execute('v %= 3')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3 % 3)
+
+        calc.execute('v = 3.8')
+        calc.execute('v %= 3.8')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3.8 % 3.8)
+
+        calc.execute('v = 3')
+        calc.execute('v **= 3')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3 ** 3)
+
+        calc.execute('v = 3.8')
+        calc.execute('v **= 3.8')
+        ans = calc.execute('v')
+        self.assertEqual(float(ans), 3.8 ** 3.8)
+
+        calc.execute('v = 3')
+        calc.execute('v <<= 3')
+        ans = calc.execute('v')
+        self.assertEqual(int(ans), 3 << 3)
+
+        calc.execute('v = 3')
+        calc.execute('v >>= 3')
+        ans = calc.execute('v')
+        self.assertEqual(int(ans), 3 >> 3)
+
+        calc.execute('v = 3')
+        calc.execute('v &= 3')
+        ans = calc.execute('v')
+        self.assertEqual(int(ans), 3 & 3)
+
+        calc.execute('v = 3')
+        calc.execute('v |= 3')
+        ans = calc.execute('v')
+        self.assertEqual(int(ans), 3 | 3)
+
+        calc.execute('v = 3')
+        calc.execute('v ^= 3')
+        ans = calc.execute('v')
+        self.assertEqual(int(ans), 3 ^ 3)
+
+    def test_func(self):
+        calc = swisscalc.Calc()
+
+        ans = calc.execute('log(2 ** 8, 2)')
+        self.assertEqual(float(ans), math.log(2 ** 8, 2))
+
+class InterfaceTest(unittest.TestCase):
+    def test_names(self):
+        calc = swisscalc.Calc()
+
+        ans = calc.execute('pi')
+        self.assertEqual(float(ans), math.pi)
+
+        ans = calc.execute('e')
+        self.assertEqual(float(ans), math.e)
 
 if __name__ == "__main__":
     unittest.main()
