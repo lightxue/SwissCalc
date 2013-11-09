@@ -271,11 +271,11 @@ class Calc(Parser):
             return
         var = self.names[p[1]]
         if p[2] == '/=':
-            var = self.common_binops[p[2]](var, float(p[3]))
+            self.names[p[1]] = self.common_binops[p[2]](var, float(p[3]))
         elif p[2] in self.common_binops:
-            var = self.common_binops[p[2]](var, p[3])
+            self.names[p[1]] = self.common_binops[p[2]](var, p[3])
         else:
-            var = self.common_binops[p[2]](int(var), int(p[3]))
+            self.names[p[1]] = self.int_binops[p[2]](int(var), int(p[3]))
 
     def p_expression_binop(self, p):
         '''
