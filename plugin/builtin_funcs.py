@@ -59,22 +59,6 @@ Print formatted string like printf in C
     '''
     print fmt % var
 
-def hex(x):
-    '''
-hex(x)
-
-Print hexadecimal representation of integer or string
-    '''
-    if isinstance(x ,(int, long)):
-        s = '{0:x}'.format(x)
-    elif isinstance(x, str):
-        s = x.encode('hex')
-    else:
-        raise Exception("type: %s argument can't be converted to hex" % (type(x)))
-    r = [s[i:i+2] for i in xrange(0, len(s), 2)]
-    r = [r[i:i+4] for i in xrange(0, len(r), 4)]
-    print('\n'.join(' '.join(line) for line in r))
-
 def md5(s):
     '''
 md5(s)
@@ -146,6 +130,38 @@ stresc_decode(s)
 Return the value of unescape string s
     '''
     return s.decode('string-escape')
+
+# Utils
+
+def hex(x):
+    '''
+hex(x)
+
+Print hexadecimal representation of integer or string
+    '''
+    if isinstance(x ,(int, long)):
+        s = '{0:x}'.format(x)
+    elif isinstance(x, str):
+        s = x.encode('hex')
+    else:
+        raise Exception("type: %s argument can't be converted to hex" % (type(x)))
+    r = [s[i:i+2] for i in xrange(0, len(s), 2)]
+    r = [r[i:i+4] for i in xrange(0, len(r), 4)]
+    print('\n'.join(' '.join(line) for line in r))
+
+def humansize(n):
+    '''
+humansize(n)
+
+Convert file size from n bytes to human-readable string
+
+return the human readable-string
+    '''
+    for s in ['B', 'KiB', 'MiB', 'GiB', 'TiB']:
+        if n < 1024.0:
+            return '%.1f %s' % (n, s)
+        n /= 1024.0
+    return '%f PiB' % n
 
 builtin_funcs = {var : globals()[var]
               for var in dir() if callable(globals()[var])}
