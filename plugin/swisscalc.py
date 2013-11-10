@@ -35,7 +35,7 @@ class Parser(object):
         self.names = {}
         self.funcs = {}
         self.lineno = 0
-        self.excval = ''
+        self.exeval = ''
         try:
             modname = os.path.split(os.path.splitext(__file__)[0])[1] +\
                       "_" + self.__class__.__name__
@@ -56,17 +56,22 @@ class Parser(object):
             return
         try:
             sys.stdout = mystdout = cStringIO.StringIO()
-            self.excval = ''
+            self.exeval = ''
             yacc.parse(s)
-        except SyntaxError, err:
-            self.excval = 'SyntaxError: %s' % (err)
-        except Exception, err:
-            self.excval = 'RuntimeError: %s' % (err)
-            #raise
-            #print('exception: %s' % err)
-        sys.stdout = sys.__stdout__
-        return mystdout.getvalue() + self.excval
+        except SyntaxError as err:
+            self.exeval = 'SyntaxError: %s' % (err)
+        except Exception as err:
+            self.exeval = 'RuntimeError: %s' % (err)
 
+        sys.stdout = sys.__stdout__
+        outstr = mystdout.getvalue()
+
+        if not outstr:
+            return self.exeval
+        elif self.exeval == '' and outstr.endswith('\n'):
+            return outstr[:-1]
+        else:
+            return outstr + '\n' + self.exeval
 
     def run(self):
         while 1:
@@ -76,7 +81,7 @@ class Parser(object):
                 break
             val = self.execute(s)
             if val:
-                print val
+                print(val)
 
     def _lexme(self, s):
         self.lexer.input(s)
@@ -89,7 +94,7 @@ class Parser(object):
             except EOFError:
                 break
             for tok in self._lexme(s):
-                print tok
+                print(tok)
 
 
 class Calc(Parser):
@@ -201,7 +206,7 @@ class Calc(Parser):
 
     def t_error(self, t):
         t.lexer.skip(1)
-        raise SyntaxError("Illegal character '%s' in %d line" % (t.value[0], t.lexer.lineno))
+        raise SyntaxError("illegal character '%s'" % (t.value[0]))
 
     ## Parsing rules
 
@@ -221,10 +226,10 @@ class Calc(Parser):
         '''statement : expression'''
         if p[1] is None:
             return
-        if isinstance(p[1], int):
+        if isinstance(p[1], (int, long)):
             p[1] = self.truncint(p[1])
         self.names['_'] = p[1]
-        self.excval = self.repr_result(p[1])
+        self.exeval = self.repr_result(p[1])
 
     def p_statement_newline(self, p):
         '''statement : newline'''
@@ -373,9 +378,7 @@ class Calc(Parser):
         try:
             p[0] = self.names[p[1]]
         except LookupError:
-            # should thorw exception here
-            raise SyntaxError("Undefined name '%s'" % p[1])
-            #p[0] = 0
+            raise SyntaxError("undefined variable: '%s'" % p[1])
 
     def p_integer(self, p):
         '''integer : decint
@@ -392,11 +395,10 @@ class Calc(Parser):
         p[0] = p[1]
 
     def p_error(self, p):
-        raise SyntaxError("Syntax error at '%s'" % (p.value))
-        #if p:
-            #print("Syntax error at '%s' in line %d" % (p.value, self.lineno))
-        #else:
-            #print("Syntax error at EOF")
+        if p:
+            raise SyntaxError("syntax error at '%s'" % (p.value))
+        else:
+            raise SyntaxError("unkown syntax error")
 
     # Interfacec
     def __init__(self, **kw):
@@ -409,6 +411,7 @@ class Calc(Parser):
         self.funcs['vars'] = self.show_names
         self.funcs['env'] = self.env
         self.funcs['setenv'] = self.setenv
+        self.funcs['help'] = self.helper
         # _ store last result, just like interactive python interpreter
         self.names['_'] = 0
         self.names['pi'] = math.pi
@@ -477,6 +480,8 @@ class Calc(Parser):
             print(self.repr_kv(name.rjust(10), self._env[name]))
 
     def setenv(self, name, value):
+        if name not in self._env:
+            raise Exception('"%s" is not a environment variable' % name)
         self._env[name] = int(value)
 
     def truncint(self, val):
@@ -484,6 +489,11 @@ class Calc(Parser):
         signed = int(self._env['signed'] > 0)
         bits = 1 << (self._env['word'] * 8)
         return (val & (bits - 1)) - bool(val & (bits >> 1)) * signed * bits
+
+    def helper(self, func):
+        if func not in self.funcs:
+            raise SyntaxError('function: %s not found' % func)
+        print self.funcs[func].__doc__
 
 if __name__ == '__main__':
     calc = Calc(debug=0)
