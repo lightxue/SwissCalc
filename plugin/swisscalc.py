@@ -470,16 +470,31 @@ class Calc(Parser):
         return '%s = %s' % (key, repr(val))
 
     def show_names(self):
+        '''
+        vars()
+
+        Print variables
+        '''
         for name, value in self.names.iteritems():
             print(self.repr_kv(name, value))
 
     def env(self):
+        '''
+        env()
+
+        Print interal environment variables
+        '''
         names = self._env.keys()
         names.sort(key=len)
         for name in names:
             print(self.repr_kv(name.rjust(10), self._env[name]))
 
     def setenv(self, name, value):
+        '''
+        setenv(name, value)
+
+        Set environment variable name to value
+        '''
         if name not in self._env:
             raise Exception('"%s" is not a environment variable' % name)
         self._env[name] = int(value)
@@ -491,6 +506,11 @@ class Calc(Parser):
         return (val & (bits - 1)) - bool(val & (bits >> 1)) * signed * bits
 
     def helper(self, func):
+        '''
+        help(func_name)
+
+        print the document of the function which name is func_name
+        '''
         if func not in self.funcs:
             raise SyntaxError('function: %s not found' % func)
         print self.funcs[func].__doc__
