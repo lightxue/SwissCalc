@@ -161,6 +161,14 @@ def rot13(s):
     '''
     return s.encode('rot13')
 
+def encode(s, fr, to):
+    '''
+    encode(s, from_enc, to_enc)
+
+    Convert string from encoding from_enc to encoding to_enc
+    '''
+    return s.decode(fr).encode(to)
+
 # Utils
 
 def hex(x):
