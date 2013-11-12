@@ -18,6 +18,7 @@ funcs = {
     # String
     'ord'  : ord,
     'chr'  : chr,
+    'len'  : len,
 }
 
 # Numeric
@@ -100,9 +101,9 @@ def b64decode(s):
     '''
     return base64.b64decode(s)
 
-def uniesc_encode(s, encoding='utf-8'):
+def uesc(s, encoding='utf-8'):
     '''
-    uniesc_encode(s, [encoding])
+    uesc(s, [encoding])
 
     Convert s to unicode escape string. The default encoding of s is utf-8.
 
@@ -110,9 +111,9 @@ def uniesc_encode(s, encoding='utf-8'):
     '''
     return s.decode(encoding).encode('unicode-escape')
 
-def uniesc_decode(s, encoding='utf-8'):
+def uunesc(s, encoding='utf-8'):
     '''
-    uniesc_decode(s, [encoding])
+    uunesc(s, [encoding])
 
     Decode s from  unicode escape string to string. The default encoding of decode string is utf-8
 
@@ -120,17 +121,17 @@ def uniesc_decode(s, encoding='utf-8'):
     '''
     return s.decode('unicode-escape').encode(encoding)
 
-def stresc_encode(s):
+def sesc(s):
     '''
-    stresc_encode(s)
+    sesc(s)
 
     Return the string escape value of s
     '''
     return s.encode('string-escape')
 
-def stresc_decode(s):
+def sunesc(s):
     '''
-    stresc_decode(s)
+    sunesc(s)
 
     Return the value of unescape string s
     '''
@@ -152,6 +153,14 @@ def urldecode(s):
     '''
     return urllib2.unquote(s)
 
+def rot13(s):
+    '''
+    rot13(s):
+
+    Return caesar-cypher encryption of the operand
+    '''
+    return s.encode('rot13')
+
 # Utils
 
 def hex(x):
@@ -161,7 +170,8 @@ def hex(x):
     Print hexadecimal representation of integer or string
     '''
     if isinstance(x ,(int, long)):
-        s = '{0:x}'.format(x)
+        s = '0x{0:x}'.format(x)
+        return s
     elif isinstance(x, str):
         s = x.encode('hex')
     else:
@@ -170,9 +180,9 @@ def hex(x):
     r = [r[i:i+4] for i in xrange(0, len(r), 4)]
     print('\n'.join(' '.join(line) for line in r))
 
-def readable_size(n):
+def rsize(n):
     '''
-    readable_size(n)
+    rsize(n)
 
     Convert file size from n bytes to human-readable string
 
@@ -184,9 +194,9 @@ def readable_size(n):
         n /= 1024.0
     return '%f YiB' % n
 
-def unreadable_size(s):
+def nsize(s):
     '''
-    unreadable_size(s)
+    nsize(s)
 
     Convert human-readable file size to the number of bytes. Ignore parameter's case.
 
