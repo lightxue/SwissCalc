@@ -238,9 +238,10 @@ def repl(expr):
         result = calc.execute(expr)
         if not result:
             return
-        for str in result.split("\n"):
-            vim.command("call append(line('$'), \"" + str + "\")")
-        vim.command("if exists(\"w:vcalc_vim_command\") | unlet w:vcalc_vim_command | endif")
+        result = result.replace('"', r'\"')
+        for s in result.split('\n'):
+            vim.command('''call append(line('$'), "%s")''' % s)
+        vim.command('if exists("w:vcalc_vim_command") | unlet w:vcalc_vim_command | endif')
 EOF
 
 endif
