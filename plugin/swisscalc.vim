@@ -234,14 +234,13 @@ calc = swisscalc.Calc(debug=0)
 
 def repl(expr):
     expr = expr.strip()
-    if expr != "":
-        result = calc.execute(expr)
-        if not result:
-            return
-        result = result.replace('"', r'\"')
-        for s in result.split('\n'):
-            vim.command('''call append(line('$'), "%s")''' % s)
-        vim.command('if exists("w:vcalc_vim_command") | unlet w:vcalc_vim_command | endif')
+    if not expr:
+        return
+    result = calc.execute(expr)
+    if not result:
+        return
+    vim.current.buffer.append(result + '\n')
+    vim.command('if exists("w:vcalc_vim_command") | unlet w:vcalc_vim_command | endif')
 EOF
 
 endif
