@@ -17,8 +17,8 @@ import ply.yacc as yacc
 import os
 import math
 import operator
-import builtin_funcs
-import custom_funcs
+import builtin
+import custom
 import cStringIO
 
 class SyntaxError(Exception): pass
@@ -403,10 +403,10 @@ class Calc(Parser):
     # Interfacec
     def __init__(self, **kw):
         super(Calc, self).__init__(**kw)
-        self.funcs.update(builtin_funcs.funcs)
-        cusfuncs = {var : getattr(custom_funcs, var)
-                        for var in dir(custom_funcs)
-                            if callable(getattr(custom_funcs, var))}
+        self.funcs.update(builtin.funcs)
+        cusfuncs = {var : getattr(custom, var)
+                        for var in dir(custom)
+                            if callable(getattr(custom, var))}
         self.funcs.update(cusfuncs)
         self.funcs['vars'] = self.show_names
         self.funcs['env'] = self.env
