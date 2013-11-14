@@ -138,15 +138,15 @@ endfunction
 
 function! s:SCalc_REPL(continueInsert)
 
-    let expr = getline(".")
-    if match(expr, g:SwissCalc_Prompt) != 0
+    let s:expr = getline(".")
+    if match(s:expr, g:SwissCalc_Prompt) != 0
         return
     else
-        let expr = strpart(expr, matchend(expr, g:SwissCalc_Prompt))
+        let s:expr = strpart(s:expr, matchend(s:expr, g:SwissCalc_Prompt))
     endif
 
-    call <SID>SCalc_RecordHistory(expr)
-    exe "python repl(''' " . expr . " ''')"
+    call <SID>SCalc_RecordHistory(s:expr)
+    py repl(vim.eval('s:expr'))
 
     "if executed command don't continue -- may be a ':q'
     if exists("w:vcalc_vim_command")
@@ -239,7 +239,8 @@ def repl(expr):
     result = calc.execute(expr)
     if not result:
         return
-    vim.current.buffer.append(result + '\n')
+    for line in result.split('\n'):
+        vim.current.buffer.append(line + '\n')
     vim.command('if exists("w:vcalc_vim_command") | unlet w:vcalc_vim_command | endif')
 EOF
 
