@@ -420,7 +420,6 @@ class Calc(Parser):
         self.names['pi'] = math.pi
         self.names['e'] = math.e
         self._env = {
-            'float'  : 1,
             'signed' : 1,
             'word'   : 4,
             'bin'    : 0,
