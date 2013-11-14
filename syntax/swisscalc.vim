@@ -18,24 +18,21 @@ syn region scalc_string
 syn region scalc_raw_string
       \ start=+[uU]\=[rR]\z(['"]\)+ end="\z1" skip="\\\\\|\\\z1"
       \ contains=@Spell
-syn match   scalc_escape    +\\[abfnrtv'"\\]+ contained
-syn match   scalc_escape    "\\\o\{1,3}" contained
-syn match   scalc_escape    "\\x\x\{2}" contained
-syn match   scalc_escape    "\%(\\u\x\{4}\|\\U\x\{8}\)" contained
-syn match   scalc_escape    "\\N{\a\+\%(\s\a\+\)*}" contained
-syn match   scalc_escape    "\\$"
+syn match scalc_escape    +\\[abfnrtv'"\\]+ contained
+syn match scalc_escape    "\\\o\{1,3}" contained
+syn match scalc_escape    "\\x\x\{2}" contained
+syn match scalc_escape    "\%(\\u\x\{4}\|\\U\x\{8}\)" contained
+syn match scalc_escape    "\\N{\a\+\%(\s\a\+\)*}" contained
+syn match scalc_escape    "\\$"
 
-syn match   scalc_num    "\<0[oO]\=\o\+\>"
-syn match   scalc_num    "\<0[xX]\x\+\>"
-syn match   scalc_num    "\<0[bB][01]\+\>"
-syn match   scalc_num    "\<\%([1-9]\d*\|0\)\>"
-syn match   scalc_num    "\<\d\+[eE][+-]\=\d\+\>"
-syn match   scalc_num
-    \ "\<\d\+\.\%([eE][+-]\=\d\+\)\=\%(\W\|$\)\@="
-syn match   scalc_num
-    \ "\%(^\|\W\)\@<=\d*\.\d\+\%([eE][+-]\=\d\+\)\=\>"
+syn match scalc_num    "\<0[oO]\=\o\+\>"
+syn match scalc_num    "\<0[xX]\x\+\>"
+syn match scalc_num    "\<0[bB][01]\+\>"
+syn match scalc_num    "\<\%([1-9]\d*\|0\)\>"
+syn match scalc_num    "\<\d\+[eE][+-]\=\d\+\>"
+syn match scalc_num    "\<\d\+\.\%([eE][+-]\=\d\+\)\=\%(\W\|$\)\@="
+syn match scalc_num    "\%(^\|\W\)\@<=\d*\.\d\+\%([eE][+-]\=\d\+\)\=\>"
 
-syntax match scalc_op "+\|-\|\*\|/\|%\|\*\*\|!\|<<\|>>\|&\|\~\||\|\^\|=\|+=\|-=\|\*=\|/=\|%=\|\*\*=\|<<=\|>>=\|&=\||=\|\^="
 syntax match scalc_delim "(\|)"
 
 if version >= 600
@@ -49,13 +46,26 @@ if g:SwissCalc_Prompt != ''
     HiLink scalc_prompt Type
 endif
 
+if exists('g:SwissCalc_Ops')
+    silent execute "syn match scalc_op '" . g:SwissCalc_Ops . "'"
+    HiLink scalc_op Operator
+endif
+
 if exists('g:SwissCalc_Funcs')
     silent execute "syn match scalc_func '" . g:SwissCalc_Funcs . "'"
     HiLink scalc_func Function
 endif
 
+syn match  scalc_bin '\<bin: '
+syn match  scalc_oct '\<oct: '
+syn match  scalc_dec '\<dec: '
+syn region scalc_hex start="\<hex: " end="\X"me=e-1 skip=" "
 
-HiLink scalc_op         Operator
+HiLink scalc_bin        Include
+HiLink scalc_oct        Define
+HiLink scalc_dec        Keyword
+HiLink scalc_hex        Number
+
 HiLink scalc_delim      Delimiter
 
 HiLink scalc_string     String
@@ -64,6 +74,7 @@ HiLink scalc_escape     Special
 
 HiLink scalc_num        Number
 HiLink scalc_error      ErrorMsg
+
 
 delcommand HiLink
 

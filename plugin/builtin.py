@@ -12,7 +12,7 @@ import base64
 import re
 import urllib2
 import time
-import datetime
+import vim
 
 funcs = {
     # String
@@ -186,6 +186,7 @@ def hex(x):
         raise Exception("type: %s argument can't be converted to hex" % (type(x)))
     r = [s[i:i+2] for i in xrange(0, len(s), 2)]
     r = [r[i:i+4] for i in xrange(0, len(r), 4)]
+    print 'hex: '
     print('\n'.join(' '.join(line) for line in r))
 
 def rsize(n):
@@ -198,7 +199,7 @@ def rsize(n):
     '''
     for s in ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB']:
         if n < 1024.0:
-            return '%.1f %s' % (n, s)
+            return '%.3f %s' % (n, s)
         n /= 1024.0
     return '%f YiB' % n
 
@@ -245,8 +246,20 @@ def strptime(string, fmt='%Y-%m-%d %H:%M:%S'):
 
     Parse a string to a time stamp according to a format specification.
     '''
+    import datetime
     dt = datetime.datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
     return time.mktime(dt.timetuple())
+
+def rand():
+    import random
+    return random.randint(0, 2 ** 31)
+
+def color(fg, bg=''):
+    group = 'hicolor' + fg[1:]
+    vim.command(r'syn match %s "%s"' % (group, fg))
+    vim.command(r'syn cluster hicolor add=%s' % group)
+    vim.command(r'hi %s ctermfg=%s' % (group, fg))
+    print fg
 
 builtin_funcs = {var : globals()[var]
               for var in dir() if callable(globals()[var])}

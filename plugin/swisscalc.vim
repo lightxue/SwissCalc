@@ -234,6 +234,11 @@ calc = swisscalc.Calc(debug=0)
 
 funcs = r'\\|'.join(r'\\<%s\\>' % func for func in calc.funcs)
 vim.command('let g:SwissCalc_Funcs = "%s"' % funcs)
+ops = ['+', '-', r'\\*', '/', '%', r'\\*\\*', '!', '<<', '>>', '&',
+       r'\\~', '|', r'\\^', '=', '+=', '-=', r'\\*=', '/=', '%=',
+       r'\\*\\*=', '<<=', '>>=', '&=', '|=', r'\\^=']
+ops = r'\\|'.join(ops)
+vim.command('let g:SwissCalc_Ops = "%s"' % ops)
 
 def repl(expr):
     expr = expr.strip()
