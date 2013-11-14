@@ -232,6 +232,9 @@ import swisscalc
 
 calc = swisscalc.Calc(debug=0)
 
+funcs = r'\\|'.join(r'\\<%s\\>' % func for func in calc.funcs)
+vim.command('let g:SwissCalc_Funcs = "%s"' % funcs)
+
 def repl(expr):
     expr = expr.strip()
     if not expr:

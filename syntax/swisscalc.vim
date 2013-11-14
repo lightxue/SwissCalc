@@ -38,15 +38,20 @@ syn match   scalc_num
 syntax match scalc_op "+\|-\|\*\|/\|%\|\*\*\|!\|<<\|>>\|&\|\~\||\|\^\|=\|+=\|-=\|\*=\|/=\|%=\|\*\*=\|<<=\|>>=\|&=\||=\|\^="
 syntax match scalc_delim "(\|)"
 
-if g:SwissCalc_Prompt != ''
-    silent execute "syn match scalc_prompt '" . g:SwissCalc_Prompt . "'"
-    hi def link scalc_prompt Label
-endif
-
 if version >= 600
     command -nargs=+ HiLink highlight default link <args>
 else
     command -nargs=+ HiLink highlight         link <args>
+endif
+
+if g:SwissCalc_Prompt != ''
+    silent execute "syn match scalc_prompt '" . g:SwissCalc_Prompt . "'"
+    HiLink scalc_prompt Type
+endif
+
+if exists('g:SwissCalc_Funcs')
+    silent execute "syn match scalc_func '" . g:SwissCalc_Funcs . "'"
+    HiLink scalc_func Function
 endif
 
 
