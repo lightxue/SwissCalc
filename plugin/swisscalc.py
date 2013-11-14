@@ -15,6 +15,7 @@ import ply.lex as lex
 from ply.lex import TOKEN
 import ply.yacc as yacc
 import os
+import re
 import math
 import operator
 import builtin
@@ -409,6 +410,8 @@ class Calc(Parser):
                             if callable(getattr(custom, var))}
         self.funcs.update(cusfuncs)
         self.funcs['vars'] = self.show_names
+        self.funcs['funcs'] = self.show_funcs
+        self.funcs['find_func'] = self.find_func
         self.funcs['env'] = self.env
         self.funcs['setenv'] = self.setenv
         self.funcs['help'] = self.helper
@@ -477,6 +480,27 @@ class Calc(Parser):
         '''
         for name, value in self.names.iteritems():
             print(self.repr_kv(name, value))
+
+    def show_funcs(self):
+        '''
+        funcs()
+
+        Print functions
+        '''
+        for func in self.funcs:
+            print(func)
+
+    def find_func(self, key):
+        '''
+        find_func(key)
+
+        Search functions by regular expression key
+        Print the Search result
+        '''
+        r = re.compile(key)
+        for func in self.funcs:
+            if r.match(func):
+                print(func)
 
     def env(self):
         '''
