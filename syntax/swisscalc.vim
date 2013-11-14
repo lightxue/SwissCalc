@@ -10,19 +10,37 @@ elseif exists("b:current_syntax")
     finish
 endif
 
+syn match scalc_error '^SyntaxError: .*$'
+syn match scalc_error '^RuntimeError: .*$'
+
+syn region scalc_string
+      \ start=+\z(['"]\)+ end="\z1" skip="\\\\\|\\\z1"
+syn region scalc_raw_string
+      \ start=+[uU]\=[rR]\z(['"]\)+ end="\z1" skip="\\\\\|\\\z1"
+      \ contains=@Spell
+syn match   scalc_escape    +\\[abfnrtv'"\\]+ contained
+syn match   scalc_escape    "\\\o\{1,3}" contained
+syn match   scalc_escape    "\\x\x\{2}" contained
+syn match   scalc_escape    "\%(\\u\x\{4}\|\\U\x\{8}\)" contained
+syn match   scalc_escape    "\\N{\a\+\%(\s\a\+\)*}" contained
+syn match   scalc_escape    "\\$"
+
+syn match   scalc_num    "\<0[oO]\=\o\+\>"
+syn match   scalc_num    "\<0[xX]\x\+\>"
+syn match   scalc_num    "\<0[bB][01]\+\>"
+syn match   scalc_num    "\<\%([1-9]\d*\|0\)\>"
+syn match   scalc_num    "\<\d\+[eE][+-]\=\d\+\>"
+syn match   scalc_num
+    \ "\<\d\+\.\%([eE][+-]\=\d\+\)\=\%(\W\|$\)\@="
+syn match   scalc_num
+    \ "\%(^\|\W\)\@<=\d*\.\d\+\%([eE][+-]\=\d\+\)\=\>"
+
 syntax match scalc_op "+\|-\|\*\|/\|%\|\*\*\|!\|<<\|>>\|&\|\~\||\|\^\|=\|+=\|-=\|\*=\|/=\|%=\|\*\*=\|<<=\|>>=\|&=\||=\|\^="
 syntax match scalc_delim "(\|)"
 
-syntax match scalc_float "[0-9]\+\(\.[0-9]\+\)\?\(e[+-]\?[0-9]\+\)\?"
-syntax match scalc_hex "0[xX][0-9a-fA-F]\+"
-syntax match scalc_oct "0[oO]\?[0-7]\+"
-syntax match scalc_bin "0[bB][01]\+"
-
-" TODO string, function, error
-
 if g:SwissCalc_Prompt != ''
     silent execute "syn match scalc_prompt '" . g:SwissCalc_Prompt . "'"
-    hi def link scalc Type
+    hi def link scalc_prompt Label
 endif
 
 if version >= 600
@@ -31,41 +49,16 @@ else
     command -nargs=+ HiLink highlight         link <args>
 endif
 
-"Keywords
-HiLink vcalcLet         vcalcKeyword
-HiLink vcalcKeyword     Keyword
-
-"Functions
-HiLink vcalcFuncs       Function
-
-"Operators
-HiLink vcalcOps         Operator
-
-"Delimiters
-HiLink vcalcDelim       Delimiter
-
-"Directives
-HiLink vcalcDirectives  Special
-
-"Numbers
-HiLink vcalcDecNum      vcalcNumber
-HiLink vcalcHexNum      vcalcNumber
-HiLink vcalcOctNum      vcalcNumber
-HiLink vcalcNumber      Number
-
-"Errors
-HiLink vcalcSynErr      vcalcError
-HiLink vcalcParErr      vcalcError
-HiLink vcalcError       Error
 
 HiLink scalc_op         Operator
 HiLink scalc_delim      Delimiter
 
-HiLink scalc_float      scalc_num
-HiLink scalc_hex        scalc_num
-HiLink scalc_oct        scalc_num
-HiLink scalc_bin        scalc_num
+HiLink scalc_string     String
+HiLink scalc_raw_string String
+HiLink scalc_escape     Special
+
 HiLink scalc_num        Number
+HiLink scalc_error      ErrorMsg
 
 delcommand HiLink
 
