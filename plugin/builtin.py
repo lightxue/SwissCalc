@@ -12,13 +12,16 @@ import base64
 import re
 import urllib2
 import time
-import vim
 
 funcs = {
     # String
     'ord'  : ord,
     'chr'  : chr,
     'len'  : len,
+    # Util
+    'int'  : int,
+    'float'  : float,
+    'str'  : str,
 }
 
 # Numeric
@@ -185,7 +188,7 @@ def hex(x):
     else:
         raise Exception("type: %s argument can't be converted to hex" % (type(x)))
     r = [s[i:i+2] for i in xrange(0, len(s), 2)]
-    r = [r[i:i+4] for i in xrange(0, len(r), 4)]
+    r = [r[i:i+8] for i in xrange(0, len(r), 8)]
     print 'hex: '
     print('\n'.join(' '.join(line) for line in r))
 
@@ -255,6 +258,8 @@ def rand():
     return random.randint(0, 2 ** 31)
 
 def color(fg, bg=''):
+    return
+    import vim
     group = 'hicolor' + fg[1:]
     vim.command(r'syn match %s "%s"' % (group, fg))
     vim.command(r'syn cluster hicolor add=%s' % group)
