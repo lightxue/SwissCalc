@@ -323,7 +323,8 @@ class Calc(Parser):
                       | add expression %prec uadd
                       | not expression
         '''
-        if    p[1] == '-' : p[0] = self.truncint(-p[2])
+        if    p[1] == '-' :
+            p[0] = -p[2] if isinstance(p[2], float) else self.truncint(-p[2])
         elif  p[1] == '+' : p[0] =  p[2]
         elif  p[1] == '~' : p[0] = ~int(p[2])
 
