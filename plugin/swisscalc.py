@@ -212,6 +212,9 @@ class Calc(Parser):
     ## Parsing rules
 
     precedence = (
+        ('left', 'assign', 'addassign', 'subassign', 'mulassign',
+         'divassign', 'modassign', 'powassign', 'lsftassign',
+         'rsftassign', 'andassign', 'orassign', 'xorassign'),
         ('left', 'or'),
         ('left', 'xor'),
         ('left', 'and'),
@@ -265,23 +268,25 @@ class Calc(Parser):
         '^='  : operator.xor,
     }
 
-    def p_statement_assign(self, p):
+    def p_expression_assign(self, p):
         '''
-        statement : ident assign     expression
-                  | ident addassign  expression
-                  | ident subassign  expression
-                  | ident mulassign  expression
-                  | ident divassign  expression
-                  | ident modassign  expression
-                  | ident powassign  expression
-                  | ident lsftassign expression
-                  | ident rsftassign expression
-                  | ident andassign  expression
-                  | ident orassign   expression
-                  | ident xorassign  expression
+        expression : ident assign     expression
+                   | ident addassign  expression
+                   | ident subassign  expression
+                   | ident mulassign  expression
+                   | ident divassign  expression
+                   | ident modassign  expression
+                   | ident powassign  expression
+                   | ident lsftassign expression
+                   | ident rsftassign expression
+                   | ident andassign  expression
+                   | ident orassign   expression
+                   | ident xorassign  expression
         '''
         if p[2] == '=':
+            if p[3] is None: p[3] = 0
             self.names[p[1]] = p[3]
+            p[0] = p[3]
             return
         var = self.names[p[1]]
         if p[2] == '/=':
@@ -290,6 +295,7 @@ class Calc(Parser):
             self.names[p[1]] = self.common_binops[p[2]](var, p[3])
         else:
             self.names[p[1]] = self.int_binops[p[2]](int(var), int(p[3]))
+        p[0] = self.names[p[1]]
 
     def p_expression_binop(self, p):
         '''
@@ -317,7 +323,7 @@ class Calc(Parser):
                       | add expression %prec uadd
                       | not expression
         '''
-        if    p[1] == '-' : p[0] = -p[2]
+        if    p[1] == '-' : p[0] = self.truncint(-p[2])
         elif  p[1] == '+' : p[0] =  p[2]
         elif  p[1] == '~' : p[0] = ~int(p[2])
 
@@ -387,7 +393,7 @@ class Calc(Parser):
                    | octint
                    | hexint
         '''
-        p[0] = p[1]
+        p[0] = self.truncint(p[1])
 
     def p_float(self, p):
         '''float : pointfloat
@@ -421,7 +427,7 @@ class Calc(Parser):
         self.names['e'] = math.e
         self._env = {
             'signed' : 1,
-            'word'   : 4,
+            'word'   : 8,
             'bin'    : 0,
             'oct'    : 0,
             'dec'    : 1,
@@ -435,15 +441,15 @@ class Calc(Parser):
         s = '{0:0{width}b}'.format(integer, width=length)
         # 8 bits a byte
         r = [s[i:i+8] for i in xrange(0, len(s), 8)]
-        # 4 bytes a line
-        r = [r[i:i+4] for i in xrange(0, len(r), 4)]
+        # 8 bytes a line
+        r = [r[i:i+8] for i in xrange(0, len(r), 8)]
         return 'bin: ' + '\n     '.join(' '.join(line) for line in r)
 
     def oct_int(self, integer):
         return 'oct: {0:o}'.format(integer)
 
     def dec_int(slef, integer):
-        return 'dec: %d' % integer
+        return ('dec: %d' % integer).replace('L', '')
 
     def hex_int(self, integer):
         word = self._env['word']
@@ -452,8 +458,8 @@ class Calc(Parser):
         s = '{0:0{width}x}'.format(integer, width=length)
         # 2 digit a byte
         r = [s[i:i+2] for i in xrange(0, len(s), 2)]
-        # 4 bytes a line
-        r = [r[i:i+4] for i in xrange(0, len(r), 4)]
+        # 8 bytes a line
+        r = [r[i:i+8] for i in xrange(0, len(r), 8)]
         return 'hex: ' + '\n     '.join(' '.join(line) for line in r)
 
     def repr_result(self, result):
@@ -461,7 +467,7 @@ class Calc(Parser):
             return repr(result)
         nsys = [x for x in ('bin', 'oct', 'dec', 'hex') if self._env[x]]
         if nsys == ['dec']:
-            return repr(result)
+            return repr(result).replace('L', '')
         res = []
         for ns in nsys:
             func = getattr(self, ns + '_int')
@@ -512,14 +518,17 @@ class Calc(Parser):
         for name in names:
             print(self.repr_kv(name.rjust(10), self._env[name]))
 
-    def setenv(self, name, value):
+    def setenv(self, name, value=None):
         '''
-        setenv(name, value)
+        setenv(name, [value])
 
         Set environment variable name to value
+        Default value is toggle the current value
         '''
         if name not in self._env:
             raise Exception('"%s" is not a environment variable' % name)
+        if value is None:
+            value = int(not self._env[name])
         self._env[name] = int(value)
 
     def truncint(self, val):
