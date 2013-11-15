@@ -9,48 +9,48 @@ if has('python')
     exe "python sys.path.append('" . scriptdir . "')"
 endif
 
-if exists('g:loaded_swisscalc') || v:version < 700
+if exists('g:loaded_scalc') || v:version < 700
   finish
 endif
-let g:loaded_swisscalc = 1
+let g:loaded_scalc = 1
 
 map <Leader>cl :Calc<CR>
 
 " configurable options
 "
-if !exists("g:SwissCalc_Title")
-    let g:SwissCalc_Title = "SwissCalc"
+if !exists("g:scalc_title")
+    let g:scalc_title = "SwissCalc"
 endif
-if !exists("g:SwissCalc_Prompt")
-    let g:SwissCalc_Prompt = "> "
+if !exists("g:scalc_prompt")
+    let g:scalc_prompt = "> "
 endif
-if !exists("g:SwissCalc_Win_Size")
-    let g:SwissCalc_Win_Size = 10
+if !exists("g:scalc_win_size")
+    let g:scalc_win_size = 10
 endif
-if !exists("g:SwissCalc_Max_History")
-    let g:SwissCalc_Max_History = 256
+if !exists("g:scalc_max_history")
+    let g:scalc_max_history = 256
 endif
-if !exists("g:SwissCalc_CWInsert")
-    let g:SwissCalc_CWInsert = 0
+if !exists("g:scalc_cwinsert")
+    let g:scalc_cwinsert = 0
 endif
-if !exists("g:SwissCalc_InsertOnEnter")
-    let g:SwissCalc_InsertOnEnter = 0
+if !exists("g:scalc_insert_on_enter")
+    let g:scalc_insert_on_enter = 0
 endif
-if !exists("g:SwissCalc_WindowPosition")
-    let g:SwissCalc_WindowPosition = 'top' "other possible values: left,right,bottom
+if !exists("g:scalc_win_pos")
+    let g:scalc_win_pos = 'top' "other possible values: left,right,bottom
 endif
 
-command! -nargs=0 -bar Calc call s:SCalc_Open()
+command! -nargs=0 -bar Calc call s:scalc_open()
 
-function! s:SCalc_Open()
+function! s:scalc_open()
     "validate
-    let valid = <SID>SCalc_ValidateVim()
+    let valid = <SID>scalc_validate()
     if valid == -1
         return
     endif
 
     "if the window is open, jump to it
-    let winnum = bufwinnr(g:SwissCalc_Title)
+    let winnum = bufwinnr(g:scalc_title)
     if winnum != -1
         "jump to the existing window
         if winnr() != winnum
@@ -59,45 +59,45 @@ function! s:SCalc_Open()
         return
     endif
 
-    if g:SwissCalc_WindowPosition =~ "top\\|left"
+    if g:scalc_win_pos =~ "top\\|left"
         let position = 'aboveleft'
     else
         let position = 'rightbelow'
     endif
 
     "if the buffer does not already exist create otherwise edit.
-    let bufnum = bufnr(g:SwissCalc_Title)
+    let bufnum = bufnr(g:scalc_title)
     if bufnum == -1
-        if g:SwissCalc_WindowPosition =~ "left\\|right"
+        if g:scalc_win_pos =~ "left\\|right"
             let direction = 'vnew' 
         else
             let direction = 'new'
         endif
 
-        let wcmd = direction . ' ' . g:SwissCalc_Title
-        exe 'silent ' . position . ' ' . g:SwissCalc_Win_Size . wcmd
-        call setline(1, g:SwissCalc_Prompt)
+        let wcmd = direction . ' ' . g:scalc_title
+        exe 'silent ' . position . ' ' . g:scalc_win_size . wcmd
+        call setline(1, g:scalc_prompt)
     else
-        if g:SwissCalc_WindowPosition =~ "left\\|right"
+        if g:scalc_win_pos =~ "left\\|right"
             let direction = 'vsplit' 
         else
             let direction = 'split'
         endif
 
         let wcmd = direction . ' +buffer' . bufnum
-        exe 'silent ' . position . ' ' . g:SwissCalc_Win_Size . wcmd
-        call setline(line('$'), g:SwissCalc_Prompt)
+        exe 'silent ' . position . ' ' . g:scalc_win_size . wcmd
+        call setline(line('$'), g:scalc_prompt)
     endif
 
-    let b:SwissCalc_History = []
-    let b:SwissCalc_History_Index = -1
+    let b:scalc_history = []
+    let b:scalc_history_idx = -1
 
-    call <SID>SCalc_SetLocalSettings()
-    call <SID>SCalc_DefineMappingsAndAutoCommands()
-    call <SID>SCalc_JumpToPrompt(1)
+    call <SID>scalc_local_setting()
+    call <SID>scalc_mappings()
+    call <SID>scalc_jump_to_prompt(1)
 endfunction
 
-function! s:SCalc_SetLocalSettings()
+function! s:scalc_local_setting()
     silent! setlocal buftype=nofile
     silent! setlocal nobuflisted
     silent! setlocal noswapfile
@@ -109,25 +109,25 @@ function! s:SCalc_SetLocalSettings()
 endfunction
 
 
-function! s:SCalc_DefineMappingsAndAutoCommands()
-    nnoremap <buffer> <silent> <CR> :call <SID>SCalc_REPL(0)<CR>
-    inoremap <buffer> <silent> <CR> <C-o>:call <SID>SCalc_REPL(1)<CR>
+function! s:scalc_mappings()
+    nnoremap <buffer> <silent> <CR> :call <SID>scalc_repl(0)<CR>
+    inoremap <buffer> <silent> <CR> <C-o>:call <SID>scalc_repl(1)<CR>
 
     "inserting a new line jumps to the prompt
-    nmap <buffer> <silent> o :call <SID>SCalc_JumpToPrompt(1)<CR>
-    nmap <buffer> <silent> O :call <SID>SCalc_JumpToPrompt(1)<CR>
+    nmap <buffer> <silent> o :call <SID>scalc_jump_to_prompt(1)<CR>
+    nmap <buffer> <silent> O :call <SID>scalc_jump_to_prompt(1)<CR>
 
     nmap <buffer> <silent> <F1> :help vimcalc-function-list<CR>
 
-    imap <buffer> <silent> <up> <C-o>:call <SID>SCalc_PreviousHistory()<CR>
-    imap <buffer> <silent> <down> <C-o>:call <SID>SCalc_NextHistory()<CR>
+    imap <buffer> <silent> <up> <C-o>:call <SID>scalc_pre_cmd()<CR>
+    imap <buffer> <silent> <down> <C-o>:call <SID>scalc_next_cmd()<CR>
 
     au BufEnter <buffer> :call <SID>SCalc_InsertOnEnter()
 
     call <SId>SCalc_CreateCWInsertMappings()
 endfunction
 
-function! s:SCalc_ValidateVim()
+function! s:scalc_validate()
     if has('python') != 1
         echohl WarningMsg | echomsg "SwissCalc requires the Python interface to be installed." | echohl None
         return -1
@@ -136,13 +136,13 @@ function! s:SCalc_ValidateVim()
     return 0
 endfunction
 
-function! s:SCalc_REPL(continueInsert)
+function! s:scalc_repl(continueInsert)
 
     let s:expr = getline(".")
-    if match(s:expr, g:SwissCalc_Prompt) != 0
+    if match(s:expr, g:scalc_prompt) != 0
         return
     else
-        let s:expr = strpart(s:expr, matchend(s:expr, g:SwissCalc_Prompt))
+        let s:expr = strpart(s:expr, matchend(s:expr, g:scalc_prompt))
     endif
 
     call <SID>SCalc_RecordHistory(s:expr)
@@ -154,14 +154,14 @@ function! s:SCalc_REPL(continueInsert)
         return
     endif
 
-    let failed = append(line('$'), g:SwissCalc_Prompt)
+    let failed = append(line('$'), g:scalc_prompt)
 
-    let b:SwissCalc_History_Index = -1
+    let b:scalc_history_idx = -1
 
-    call <SID>SCalc_JumpToPrompt(a:continueInsert)
+    call <SID>scalc_jump_to_prompt(a:continueInsert)
 endfunction
 
-function! s:SCalc_JumpToPrompt(withInsert)
+function! s:scalc_jump_to_prompt(withInsert)
     call setpos(".", [0, line('$'), col('$'), 0])
     if a:withInsert == 1
         startinsert!
@@ -169,36 +169,36 @@ function! s:SCalc_JumpToPrompt(withInsert)
 endfunction
 
 function! s:SCalc_RecordHistory(expr)
-    call insert(b:SwissCalc_History, a:expr)
-    if len(b:SwissCalc_History) > g:SwissCalc_Max_History
-        call remove(b:SwissCalc_History, -1)
+    call insert(b:scalc_history, a:expr)
+    if len(b:scalc_history) > g:scalc_max_history
+        call remove(b:scalc_history, -1)
     endif
 endfunction
 
-function! s:SCalc_PreviousHistory()
-    if b:SwissCalc_History_Index < len(b:SwissCalc_History)-1
-        let b:SwissCalc_History_Index += 1
-        let failed = setline(line('$'), g:SwissCalc_Prompt . b:SwissCalc_History[b:SwissCalc_History_Index])
-        call <SID>SCalc_JumpToPrompt(1)
+function! s:scalc_pre_cmd()
+    if b:scalc_history_idx < len(b:scalc_history)-1
+        let b:scalc_history_idx += 1
+        let failed = setline(line('$'), g:scalc_prompt . b:scalc_history[b:scalc_history_idx])
+        call <SID>scalc_jump_to_prompt(1)
     endif
 endfunction
 
-function! s:SCalc_NextHistory()
-    if b:SwissCalc_History_Index > 0
-        let b:SwissCalc_History_Index -= 1
-        let failed = setline(line('$'), g:SwissCalc_Prompt . b:SwissCalc_History[b:SwissCalc_History_Index])
-        call <SID>SCalc_JumpToPrompt(1)
+function! s:scalc_next_cmd()
+    if b:scalc_history_idx > 0
+        let b:scalc_history_idx -= 1
+        let failed = setline(line('$'), g:scalc_prompt . b:scalc_history[b:scalc_history_idx])
+        call <SID>scalc_jump_to_prompt(1)
     endif
 endfunction
 
 function! s:SCalc_InsertOnEnter()
-    if g:SwissCalc_InsertOnEnter
-        call <SID>SCalc_JumpToPrompt(1)
+    if g:scalc_insert_on_enter
+        call <SID>scalc_jump_to_prompt(1)
     endif
 endfunction
 
 function! s:SCalc_CreateCWInsertMappings()
-    if g:SwissCalc_CWInsert
+    if g:scalc_cwinsert
         imap <buffer> <silent> <C-W>l <ESC><C-W>l
         imap <buffer> <silent> <C-W>k <ESC><C-W>k
         imap <buffer> <silent> <C-W>j <ESC><C-W>j
@@ -233,12 +233,12 @@ import swisscalc
 calc = swisscalc.Calc(debug=0)
 
 funcs = r'\\|'.join(r'\\<%s\\>' % func for func in calc.funcs)
-vim.command('let g:SwissCalc_Funcs = "%s"' % funcs)
+vim.command('let g:scalc_funcs = "%s"' % funcs)
 ops = ['+', '-', r'\\*', '/', '%', r'\\*\\*', '!', '<<', '>>', '&',
        r'\\~', '|', r'\\^', '=', '+=', '-=', r'\\*=', '/=', '%=',
        r'\\*\\*=', '<<=', '>>=', '&=', '|=', r'\\^=']
 ops = r'\\|'.join(ops)
-vim.command('let g:SwissCalc_Ops = "%s"' % ops)
+vim.command('let g:scalc_ops = "%s"' % ops)
 
 def repl(expr):
     expr = expr.strip()

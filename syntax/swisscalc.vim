@@ -41,18 +41,18 @@ else
     command -nargs=+ HiLink highlight         link <args>
 endif
 
-if g:SwissCalc_Prompt != ''
-    silent execute "syn match scalc_prompt '" . g:SwissCalc_Prompt . "'"
+if g:scalc_prompt != ''
+    silent execute "syn match scalc_prompt '" . g:scalc_prompt . "'"
     HiLink scalc_prompt Type
 endif
 
-if exists('g:SwissCalc_Ops')
-    silent execute "syn match scalc_op '" . g:SwissCalc_Ops . "'"
+if exists('g:scalc_ops')
+    silent execute "syn match scalc_op '" . g:scalc_ops . "'"
     HiLink scalc_op Operator
 endif
 
-if exists('g:SwissCalc_Funcs')
-    silent execute "syn match scalc_func '" . g:SwissCalc_Funcs . "'"
+if exists('g:scalc_funcs')
+    silent execute "syn match scalc_func '" . g:scalc_funcs . "'"
     HiLink scalc_func Function
 endif
 
