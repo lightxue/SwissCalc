@@ -145,7 +145,7 @@ function! s:scalc_repl(continueInsert)
         let s:expr = strpart(s:expr, matchend(s:expr, g:scalc_prompt))
     endif
 
-    call <SID>SCalc_RecordHistory(s:expr)
+    call <SID>scalc_record_history(s:expr)
     py repl(vim.eval('s:expr'))
 
     "if executed command don't continue -- may be a ':q'
@@ -168,7 +168,7 @@ function! s:scalc_jump_to_prompt(withInsert)
     endif
 endfunction
 
-function! s:SCalc_RecordHistory(expr)
+function! s:scalc_record_history(expr)
     call insert(b:scalc_history, a:expr)
     if len(b:scalc_history) > g:scalc_max_history
         call remove(b:scalc_history, -1)
