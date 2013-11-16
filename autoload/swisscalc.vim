@@ -19,9 +19,9 @@ if v:version < '703' "{{{
 endif "}}}
 
 if has('python') "{{{
-    let s:scriptdir = expand("<sfile>:h") . '/'
+    let s:script_path = expand("<sfile>:h") . '/'
     py import sys
-    exe "python sys.path.append('" . s:scriptdir . "')"
+    exe "python sys.path.append('" . s:script_path . "')"
 else
     function! s:ScalcDidNotLoad()
         echohl WarningMsg
@@ -184,7 +184,7 @@ python << EOF
 import vim
 import swisscalc
 
-calc = swisscalc.Calc(debug=0)
+calc = swisscalc.Calc(vim.eval('s:script_path'))
 
 # function list
 funcs = r'\\|'.join(r'\\<%s\\>' % func for func in calc.funcs)

@@ -31,17 +31,18 @@ class Parser(object):
     tokens = ()
     precedence = ()
 
-    def __init__(self, **kw):
-        self.debug = kw.get('debug', 0)
+    def __init__(self, path, debug=None):
+        self.debug = debug
         self.names = {}
         self.funcs = {}
         self.lineno = 0
         self.exeval = ''
         try:
-            modname = os.path.split(os.path.splitext(__file__)[0])[1] +\
-                      "_" + self.__class__.__name__
+            filename = (os.path.splitext(__file__)[0] +
+                        '_' + self.__class__.__name__)
         except:
-            modname = "parser" + "_" + self.__class__.__name__
+            filename = 'parse' + '_' + self.__class__.__name__
+        modname = os.path.join(path, filename)
         self.debugfile = modname + ".dbg"
         self.tabmodule = modname + "_" + "parsetab"
 
@@ -409,8 +410,8 @@ class Calc(Parser):
             raise SyntaxError("unkown syntax error")
 
     # Interfacec
-    def __init__(self, **kw):
-        super(Calc, self).__init__(**kw)
+    def __init__(self, path, debug=None):
+        super(Calc, self).__init__(path, debug)
         self.funcs.update(builtin.funcs)
         cusfuncs = {var : getattr(custom, var)
                         for var in dir(custom)
