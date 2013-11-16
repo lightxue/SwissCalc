@@ -3,9 +3,6 @@
 " Version: 0.01
 " Website: https://github.com/lightxue/SwissCalc
 
-" vim:set foldmethod=marker:
-" vim:set shiftwidth=4:
-
 "{{{ Init
 
 if v:version < '703' "{{{
@@ -211,3 +208,6 @@ EOF
 endif
 
 "}}}
+
+" vim: foldmethod=marker shiftwidth=4
+

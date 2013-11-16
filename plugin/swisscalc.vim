@@ -3,9 +3,6 @@
 " Version: 0.01
 " Website: https://github.com/lightxue/SwissCalc
 
-" vim:set foldmethod=marker:
-" vim:set shiftwidth=4:
-
 "{{{ Init
 if exists('g:loaded_scalc') || v:version < 700
     finish
@@ -21,3 +18,6 @@ command! -nargs=0 ScalcTab    call swisscalc#ScalcOpen('tabnew')
 
 map <Leader>cl :Scalc<CR>
 "}}}
+
+" vim: foldmethod=marker shiftwidth=4
+
