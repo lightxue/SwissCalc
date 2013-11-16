@@ -12,11 +12,5 @@
 #     function's name is the same with built-in function
 
 def example():
-    return 'this is an example'
+    return 'this is a custom function example'
 
-def qbver(n):
-    res = []
-    for i in xrange(4):
-        res.insert(0, str(n & 0xffff))
-        n >>= 16
-    return '.'.join(res)
