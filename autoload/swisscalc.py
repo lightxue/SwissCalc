@@ -31,7 +31,7 @@ class Parser(object):
     tokens = ()
     precedence = ()
 
-    def __init__(self, path, debug=None):
+    def __init__(self, path='.', debug=None):
         self.debug = debug
         self.names = {}
         self.funcs = {}
@@ -42,7 +42,7 @@ class Parser(object):
                         '_' + self.__class__.__name__)
         except:
             filename = 'parse' + '_' + self.__class__.__name__
-        modname = os.path.join(path, filename)
+        modname = os.path.join(os.path.abspath(path), filename)
         self.debugfile = modname + ".dbg"
         self.tabmodule = modname + "_" + "parsetab"
 
@@ -216,9 +216,7 @@ class Calc(Parser):
         ('left', 'assign', 'addassign', 'subassign', 'mulassign',
          'divassign', 'modassign', 'powassign', 'lsftassign',
          'rsftassign', 'andassign', 'orassign', 'xorassign'),
-        ('left', 'or'),
-        ('left', 'xor'),
-        ('left', 'and'),
+        ('left', 'and', 'or', 'xor'),
         ('left', 'lshift', 'rshift'),
         ('left', 'add', 'subtract'),
         ('left', 'multiply', 'divide', 'modulo'),
@@ -410,23 +408,27 @@ class Calc(Parser):
             raise SyntaxError("unkown syntax error")
 
     # Interfacec
-    def __init__(self, path, debug=None):
+    def __init__(self, path='.', debug=None):
         super(Calc, self).__init__(path, debug)
+        self.funcs['vars'] = self.show_names
+        self.funcs['funcs'] = self.show_funcs
+        self.funcs['ff'] = self.find_func
+        self.funcs['find_func'] = self.find_func
+        self.funcs['env'] = self.env
+        self.funcs['setenv'] = self.setenv
+        self.funcs['help'] = self.helper
+
         self.funcs.update(builtin.funcs)
         cusfuncs = {var : getattr(custom, var)
                         for var in dir(custom)
                             if callable(getattr(custom, var))}
         self.funcs.update(cusfuncs)
-        self.funcs['vars'] = self.show_names
-        self.funcs['funcs'] = self.show_funcs
-        self.funcs['find_func'] = self.find_func
-        self.funcs['env'] = self.env
-        self.funcs['setenv'] = self.setenv
-        self.funcs['help'] = self.helper
+
         # _ store last result, just like interactive python interpreter
         self.names['_'] = 0
-        self.names['pi'] = math.pi
         self.names['e'] = math.e
+        self.names['pi'] = math.pi
+        self.names['phi'] = 1.6180339887498948482
         self._env = {
             'signed' : 1,
             'word'   : 8,
