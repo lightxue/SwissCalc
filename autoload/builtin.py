@@ -338,17 +338,32 @@ def pjson(s):
     Pretty pring json string
     '''
     import json
-    j = json.loads(s)
+    try:
+        j = json.loads(s)
+    except Exception as err:
+        raise Exception('json parse error: %s' % err)
     print json.dumps(j, sort_keys=True, indent=4, separators=(',', ': '))
 
 def color(fg, bg=''):
-    return
+    '''
+    color(fg, bg='')
+
+    Show color in Vim. Only work for GVim.
+    Color string should be RGB format like '#00ff00'
+    '''
     import vim
-    group = 'hicolor' + fg[1:]
-    vim.command(r'syn match %s "%s"' % (group, fg))
+    try:
+        fg = re.findall('[0-9a-fA-F]{6}', fg)[0]
+        if bg:
+            bg = re.findall('[0-9a-fA-F]{6}', bg)[0]
+    except:
+        raise Exception('color format invalid')
+
+    group = 'hicolor' + fg
+    vim.command(r'syn match %s "#%s"' % (group, fg))
     vim.command(r'syn cluster hicolor add=%s' % group)
-    vim.command(r'hi %s ctermfg=%s' % (group, fg))
-    print fg
+    vim.command(r'hi %s guifg=#%s guibg=#%s' % (group, fg, bg))
+    print '#' + fg
 
 builtin_funcs = {var : globals()[var]
               for var in dir() if callable(globals()[var])}
