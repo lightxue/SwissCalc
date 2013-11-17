@@ -331,6 +331,16 @@ def rand():
     import random
     return random.randint(0, 2 ** 31)
 
+def pjson(s):
+    '''
+    pjson(s)
+
+    Pretty pring json string
+    '''
+    import json
+    j = json.loads(s)
+    print json.dumps(j, sort_keys=True, indent=4, separators=(',', ': '))
+
 def color(fg, bg=''):
     return
     import vim
