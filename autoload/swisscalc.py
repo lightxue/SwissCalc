@@ -282,19 +282,24 @@ class Calc(Parser):
                    | ident orassign   expression
                    | ident xorassign  expression
         '''
+        var = self.names.get(p[1], 0)
         if p[2] == '=':
             if p[3] is None: p[3] = 0
-            self.names[p[1]] = p[3]
             p[0] = p[3]
-            return
-        var = self.names[p[1]]
-        if p[2] == '/=':
-            self.names[p[1]] = self.common_binops[p[2]](var, float(p[3]))
+
+        elif p[2] == '/=':
+            p[0] = self.common_binops[p[2]](var, float(p[3]))
+
         elif p[2] in self.common_binops:
-            self.names[p[1]] = self.common_binops[p[2]](var, p[3])
+            p[0] = self.common_binops[p[2]](var, p[3])
+
         else:
-            self.names[p[1]] = self.int_binops[p[2]](int(var), int(p[3]))
-        p[0] = self.names[p[1]]
+            p[0] = self.int_binops[p[2]](int(var), int(p[3]))
+
+        if isinstance(p[0], (int, long)):
+            p[0] = self.truncint(p[0])
+
+        self.names[p[1]] = p[0]
 
     def p_expression_binop(self, p):
         '''
@@ -479,7 +484,11 @@ class Calc(Parser):
         return '\n'.join(res)
 
     def repr_kv(self, key, val):
-        return '%s = %s' % (key, repr(val))
+        if isinstance(val, long):
+            val = repr(val).replace('L', '')
+        else:
+            val = repr(val)
+        return '%s = %s' % (key, val)
 
     def show_names(self):
         '''
@@ -534,6 +543,7 @@ class Calc(Parser):
         if value is None:
             value = int(not self._env[name])
         self._env[name] = int(value)
+        print self._env[name]
 
     def truncint(self, val):
         val = int(val)
