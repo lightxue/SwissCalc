@@ -4,7 +4,7 @@
 :ScalcTab	swisscalc.txt	/*:ScalcTab*
 :ScalcVSplit	swisscalc.txt	/*:ScalcVSplit*
 SwissCalc	swisscalc.txt	/*SwissCalc*
-SwissCalc.txt	swisscalc.txt	/*SwissCalc.txt*
+swisscalc	swisscalc.txt	/*swisscalc*
 swisscalc-about	swisscalc.txt	/*swisscalc-about*
 swisscalc-changelog	swisscalc.txt	/*swisscalc-changelog*
 swisscalc-commands	swisscalc.txt	/*swisscalc-commands*
