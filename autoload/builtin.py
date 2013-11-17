@@ -192,9 +192,9 @@ def hex(x):
     print 'hex: '
     print('\n'.join(' '.join(line) for line in r))
 
-def rsize(n):
+def ssize(n):
     '''
-    rsize(n)
+    ssize(n)
 
     Convert file size from n bytes to human-readable string
 
