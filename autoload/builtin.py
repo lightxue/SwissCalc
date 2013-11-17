@@ -359,11 +359,15 @@ def color(fg, bg=''):
     except:
         raise Exception('color format invalid')
 
-    group = 'hicolor' + fg
-    vim.command(r'syn match %s "#%s"' % (group, fg))
+    output = '|' + fg + '-%s' % bg * bool(bg) + '|'
+    group = 'hicolor' + output.replace('|', '').replace('-', '')
+
+    vim.command(r'syn match %s "%s"' % (group, output))
     vim.command(r'syn cluster hicolor add=%s' % group)
-    vim.command(r'hi %s guifg=#%s guibg=#%s' % (group, fg, bg))
-    print '#' + fg
+    vim.command(r'hi %s guifg=#%s' % (group, fg) +
+                ' guibg=#%s' % bg * bool(bg))
+
+    print output
 
 builtin_funcs = {var : globals()[var]
               for var in dir() if callable(globals()[var])}
