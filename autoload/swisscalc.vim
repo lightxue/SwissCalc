@@ -5,10 +5,10 @@
 
 "{{{ Init
 
-if v:version < '703' "{{{
+if version < 700 "{{{
     function! s:ScalcDidNotLoad()
         echohl WarningMsg
-        echomsg "SwissCalc unavailable: requires Vim 7.3+"
+        echomsg "SwissCalc unavailable: requires Vim 7.0+"
         echohl None
     endfunction
     command! -nargs=0 SCalc call s:ScalcDidNotLoad()
