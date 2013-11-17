@@ -8,10 +8,7 @@
 
 import math
 import hashlib
-import base64
 import re
-import urllib2
-import time
 
 funcs = {
     # String
@@ -88,12 +85,53 @@ def sha1(s):
     sha.update(s)
     return sha.hexdigest()
 
+def sha224(s):
+    '''
+    sha224(s)
+
+    Return the sha224 digest value of s as string of hexadecimal digits
+    '''
+    sha = hashlib.sha224()
+    sha.update(s)
+    return sha.hexdigest()
+
+def sha256(s):
+    '''
+    sha256(s)
+
+    Return the sha256 digest value of s as string of hexadecimal digits
+    '''
+    sha = hashlib.sha256()
+    sha.update(s)
+    return sha.hexdigest()
+
+def sha384(s):
+    '''
+    sha384(s)
+
+    Return the sha384 digest value of s as string of hexadecimal digits
+    '''
+    sha = hashlib.sha384()
+    sha.update(s)
+    return sha.hexdigest()
+
+def sha512(s):
+    '''
+    sha512(s)
+
+    Return the sha512 digest value of s as string of hexadecimal digits
+    '''
+    sha = hashlib.sha512()
+    sha.update(s)
+    return sha.hexdigest()
+
 def b64encode(s):
     '''
     b64encode(s)
 
     Return the base64 encode string of s
     '''
+    import base64
     return base64.b64encode(s)
 
 def b64decode(s):
@@ -102,6 +140,7 @@ def b64decode(s):
 
     Return the base64 decode string of s
     '''
+    import base64
     return base64.b64decode(s)
 
 def uesc(s, encoding='utf-8'):
@@ -146,6 +185,7 @@ def urlencode(s):
 
     Return the url encode string of s
     '''
+    import urllib2
     return urllib2.quote(s)
 
 def urldecode(s):
@@ -154,7 +194,29 @@ def urldecode(s):
 
     Return the url decode string of s
     '''
+    import urllib2
     return urllib2.unquote(s)
+
+def htmlencode(s, quote=0):
+    '''
+    htmlencode(s, quote=0)
+
+    Replace special characters "&", "<" and ">" to HTML-safe sequences.
+    If the optional flag quote is 1, the quotation mark character (")
+    is also translated.")
+    '''
+    import cgi
+    return cgi.escape(s, quote)
+
+def htmldecode(s, encoding='utf-8'):
+    '''
+    htmldecode(s, encoding='utf-8')
+
+    Return unescape of html entity
+    '''
+    import HTMLParser
+    h = HTMLParser.HTMLParser()
+    return h.unescape(s).encode(encoding)
 
 def rot13(s):
     '''
@@ -233,6 +295,7 @@ def now():
 
     Return the current timestamp
     '''
+    import time
     return time.time()
 
 def strftime(stamp, fmt='%Y-%m-%d %H:%M:%S'):
@@ -241,6 +304,7 @@ def strftime(stamp, fmt='%Y-%m-%d %H:%M:%S'):
 
     Convert a time stamp to a string according to a format specification.
     '''
+    import time
     return time.strftime(fmt, time.localtime(stamp))
 
 def strptime(string, fmt='%Y-%m-%d %H:%M:%S'):
@@ -249,6 +313,7 @@ def strptime(string, fmt='%Y-%m-%d %H:%M:%S'):
 
     Parse a string to a time stamp according to a format specification.
     '''
+    import time
     import datetime
     dt = datetime.datetime.strptime(string, "%Y-%m-%d %H:%M:%S")
     return time.mktime(dt.timetuple())
