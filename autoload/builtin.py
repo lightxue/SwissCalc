@@ -234,6 +234,15 @@ def encode(s, fr, to):
     '''
     return s.decode(fr).encode(to)
 
+def regex(pattern, string):
+    '''
+    regex(pattern, string)
+
+    Try to apply the regular expression pattern at string and
+    print all the match substring or nothing if not match
+    '''
+    print '\n'.join(re.findall(pattern, string))
+
 # Utils
 
 def hex(x):
