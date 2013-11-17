@@ -111,15 +111,13 @@ function! s:scalc_mappings() "{{{
     inoremap <buffer> <silent> <CR> <C-o>:call <SID>scalc_repl(1)<CR>
 
     " inserting a new line jumps to the prompt
-    nmap <buffer> <silent> o :call <SID>scalc_jump_to_prompt(1)<CR>
-    nmap <buffer> <silent> O :call <SID>scalc_jump_to_prompt(1)<CR>
+    nnoremap <buffer> <silent> o :call <SID>scalc_jump_to_prompt(1)<CR>
+    nnoremap <buffer> <silent> O :call <SID>scalc_jump_to_prompt(1)<CR>
 
-    "nmap <buffer> <silent> <F1> :help vimcalc-function-list<CR>
+    nnoremap <buffer> <silent> <F1> :help swisscalc-usage<CR>
 
-    imap <buffer> <silent> <up> <C-o>:call <SID>scalc_pre_cmd()<CR>
-    imap <buffer> <silent> <down> <C-o>:call <SID>scalc_next_cmd()<CR>
-    imap <buffer> <silent> <C-P> <C-o>:call <SID>scalc_pre_cmd()<CR>
-    imap <buffer> <silent> <C-N> <C-o>:call <SID>scalc_next_cmd()<CR>
+    inoremap <buffer> <silent> <up> <C-o>:call <SID>scalc_pre_cmd()<CR>
+    inoremap <buffer> <silent> <down> <C-o>:call <SID>scalc_next_cmd()<CR>
 
 endfunction "}}}
 
