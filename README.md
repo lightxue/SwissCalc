@@ -444,9 +444,9 @@ SwissCalc的buffer名字，这个名字不要和其它已经打开的buffer名�
 ==============================================================================
 # 13. 关于
 
-作者: Light Xue
-邮箱: bkmgtp@gmail.com
-项目主页: https://github.com/lightxue/SwissCalc
+* 作者: Light Xue
+* 邮箱: bkmgtp@gmail.com
+* 项目主页: https://github.com/lightxue/SwissCalc
 
 SwissCalc的目标是成为程序员的得力的助手。第一要点是便利，第二要点是强大。如果
 SwissCalc切实地解决了您的问题，在学习工作中帮助了您，我会非常开心。
