@@ -256,7 +256,7 @@ SwissCalc内置了一些实用的变量。
 
     变量名      描述~
     _           上一次运算结果
-    e           欧拉常数
+    e           自然常数
     pi          圆周率
     phi         黄金比例
 
@@ -468,4 +468,6 @@ SwissCalc切实地解决了您的问题，在学习工作中帮助了您，我�
 # 14. 许可证
 
 SwissCalc使用GPLv3。 详见http://gplv3.fsf.org/
+
+
 
