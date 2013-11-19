@@ -308,17 +308,17 @@ SwissCalc提供了许多内置函数，解决帮助您解决许多常见的问�
 
     sha1          返回参数的sha1
 
-    b64encode     base64编码
+    b64enc     base64编码
 
-    b64decode     base64解码
+    b64dec     base64解码
 
-    htmlencode    html编码
+    htmlenc    html编码
 
-    htmldecode    html解码
+    htmldec    html解码
 
-    urlencode     url编码
+    urlenc     url编码
 
-    urldecode     url解码
+    urldec     url解码
 
     ssize         把整数类型的字节大小转成人类易读的KiB、MiB等单位的字符串
 
@@ -359,7 +359,7 @@ SwissCalc提供了许多内置函数，解决帮助您解决许多常见的问�
 
 编写自定义函数请注意以下几点：
 
-1. 自定义函数必须内Python编写。
+1. 自定义函数必须由Python编写。
 
 2. 函数的参数和返回值必须是整数、浮点数、字符串三种类型之一。
 

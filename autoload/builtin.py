@@ -59,7 +59,7 @@ funcs['print'] = _print
 
 def printf(fmt, *var):
     '''
-    printf(fmt, [var, ...])
+    printf(fmt[, var, ...])
 
     Print formatted string like printf in C
     '''
@@ -125,18 +125,18 @@ def sha512(s):
     sha.update(s)
     return sha.hexdigest()
 
-def b64encode(s):
+def b64enc(s):
     '''
-    b64encode(s)
+    b64enc(s)
 
     Return the base64 encode string of s
     '''
     import base64
     return base64.b64encode(s)
 
-def b64decode(s):
+def b64dec(s):
     '''
-    b64decode(s)
+    b64dec(s)
 
     Return the base64 decode string of s
     '''
@@ -145,7 +145,7 @@ def b64decode(s):
 
 def uesc(s, encoding='utf-8'):
     '''
-    uesc(s, [encoding])
+    uesc(s, [encoding='utf-8'])
 
     Convert s to unicode escape string. The default encoding of s is utf-8.
 
@@ -155,7 +155,7 @@ def uesc(s, encoding='utf-8'):
 
 def uunesc(s, encoding='utf-8'):
     '''
-    uunesc(s, [encoding])
+    uunesc(s[, encoding='utf-8'])
 
     Decode s from  unicode escape string to string. The default encoding of decode string is utf-8
 
@@ -179,27 +179,27 @@ def sunesc(s):
     '''
     return s.decode('string-escape')
 
-def urlencode(s):
+def urlenc(s):
     '''
-    urlencode(s)
+    urlenc(s)
 
     Return the url encode string of s
     '''
     import urllib2
     return urllib2.quote(s)
 
-def urldecode(s):
+def urldec(s):
     '''
-    urldecode(s)
+    urldec(s)
 
     Return the url decode string of s
     '''
     import urllib2
     return urllib2.unquote(s)
 
-def htmlencode(s, quote=0):
+def htmlenc(s, quote=0):
     '''
-    htmlencode(s, quote=0)
+    htmlenc(s[, quote=0])
 
     Replace special characters "&", "<" and ">" to HTML-safe sequences.
     If the optional flag quote is 1, the quotation mark character (")
@@ -208,9 +208,9 @@ def htmlencode(s, quote=0):
     import cgi
     return cgi.escape(s, quote)
 
-def htmldecode(s, encoding='utf-8'):
+def htmldec(s, encoding='utf-8'):
     '''
-    htmldecode(s, encoding='utf-8')
+    htmldec(s[, encoding='utf-8'])
 
     Return unescape of html entity
     '''
@@ -309,7 +309,7 @@ def now():
 
 def strftime(stamp, fmt='%Y-%m-%d %H:%M:%S'):
     '''
-    strftime(stamp[, fmt]) -> string
+    strftime(stamp[, fmt='%Y-%m-%d %H:%M:%S']) -> string
 
     Convert a time stamp to a string according to a format specification.
     '''
@@ -318,7 +318,7 @@ def strftime(stamp, fmt='%Y-%m-%d %H:%M:%S'):
 
 def strptime(string, fmt='%Y-%m-%d %H:%M:%S'):
     '''
-    strptime(string[, fmt]) -> timestamp
+    strptime(string[, fmt='%Y-%m-%d %H:%M:%S']) -> timestamp
 
     Parse a string to a time stamp according to a format specification.
     '''
@@ -346,7 +346,7 @@ def pjson(s):
 
 def color(fg, bg=''):
     '''
-    color(fg, bg='')
+    color(fg[, bg=''])
 
     Show color in Vim. Only work for GVim.
     Color string should be RGB format like '#00ff00'
