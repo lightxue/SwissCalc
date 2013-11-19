@@ -38,20 +38,22 @@ class Parser(object):
         self.lineno = 0
         self.exeval = ''
         try:
-            filename = (os.path.splitext(__file__)[0] +
-                        '_' + self.__class__.__name__)
+            filename = os.path.split(__file__)[-1]
+            filename = os.path.splitext(filename)[0]
+            filename += '_' + self.__class__.__name__
         except:
             filename = 'parse' + '_' + self.__class__.__name__
-        modname = os.path.join(os.path.abspath(path), filename)
-        self.debugfile = modname + ".dbg"
-        self.tabmodule = modname + "_" + "parsetab"
+        self.basedir = os.path.abspath(path)
+        self.debugfile = os.path.join(self.basedir, filename + '.dbg')
+        self.tabmodule = filename + "_" + "parsetab"
 
         # Build the lexer and parser
         self.lexer = lex.lex(module=self, debug=self.debug)
         yacc.yacc(module=self,
                   debug=self.debug,
                   debugfile=self.debugfile,
-                  tabmodule=self.tabmodule)
+                  tabmodule=self.tabmodule,
+                  outputdir=self.basedir)
 
     def execute(self, s):
         if not s:
