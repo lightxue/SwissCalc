@@ -16,9 +16,10 @@ if version < 700 "{{{
 endif "}}}
 
 if has('python') "{{{
-    let s:script_path = expand("<sfile>:h") . '/'
+    let s:script_path = expand("<sfile>:h")
     py import sys
-    exe "python sys.path.append('" . s:script_path . "')"
+    py sys.path.append(vim.eval('s:script_path'))
+
 else
     function! s:ScalcDidNotLoad()
         echohl WarningMsg
