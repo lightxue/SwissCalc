@@ -63,6 +63,9 @@ endfunction "}}}
 "{{{ Util
 
 function! s:scalc_jump_to_prompt(insert_mode) "{{{
+    if match(getline('$'), g:scalc_prompt) != 0
+        call append(line('$'), g:scalc_prompt)
+    endif
     call setpos(".", [0, line('$'), col('$'), 0])
     if a:insert_mode == 1
         startinsert!
