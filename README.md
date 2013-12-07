@@ -53,7 +53,7 @@ SwissCalc support three data types: integer, float and string. Integer is not
 arbitrary size, see `Environment variable`. Floating-point arithmetic is
 IEEE754, which means float evaluation is not arbitrary precision.
 
-![Data type](screencast_datatypes.gif)
+![Data type](screencast/screencast-datatypes.gif)
 
 # Operations
 
@@ -72,7 +72,7 @@ IEEE754, which means float evaluation is not arbitrary precision.
     5           !          right          Factorial.
     6           **         left           Exponentiation.
 
-![Operations](screencast_operations.gif)
+![Operations](screencast/screencast-operations.gif)
 
 # Variables
 
@@ -90,7 +90,7 @@ There are some built-in variables in SwissCalc.
                 Euclidean space.
     phi         Golden ratio. Useful when working with Fibonacci sequences.
 
-![Variables](screencast_variables.gif)
+![Variables](screencast/screencast-variables.gif)
 
 # Functions
 
@@ -124,9 +124,9 @@ SwissCalc is supplied with many built-in functions. Here are some of them.
 
     str           Convert other data type to string.
 
-![Functions](screencast-bltin-funcs1.gif)
-![Functions](screencast-bltin-funcs2.gif)
-![Functions](screencast-bltin-funcs3.gif)
+![Functions](screencast/screencast-bltin-funcs1.gif)
+![Functions](screencast/screencast-bltin-funcs2.gif)
+![Functions](screencast/screencast-bltin-funcs3.gif)
 
 ## User-defined functions
 
@@ -148,7 +148,7 @@ There are something you should know before defining your own functions:
 If you do add functions that you think others would benefit from,
 please send me patches.
 
-![Functions](screencast-custom-funcs.gif)
+![Functions](screencast/screencast-custom-funcs.gif)
 
 # Environment variables
 
@@ -164,7 +164,7 @@ variables will overwrite environment variables when they have the same name.
     word         8         Number of bytes that handling integer.
     signed       1         Whether integer is signed.
 
-![Functions](screencast-env-variables.gif)
+![Functions](screencast/screencast-env-variables.gif)
 
 # Commands
 
