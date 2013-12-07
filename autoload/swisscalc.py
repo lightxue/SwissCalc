@@ -496,7 +496,7 @@ class Calc(Parser):
         '''
         vars()
 
-        Print variables
+        Print all variables
         '''
         for name, value in self.names.iteritems():
             print(self.repr_kv(name, value))
@@ -505,7 +505,7 @@ class Calc(Parser):
         '''
         funcs()
 
-        Print functions
+        Print all functions
         '''
         for func in self.funcs:
             print(func)
@@ -561,7 +561,9 @@ class Calc(Parser):
         '''
         if func not in self.funcs:
             raise SyntaxError('function: %s not found' % func)
-        print self.funcs[func].__doc__
+        doc = self.funcs[func].__doc__
+        if doc:
+            print doc
 
 if __name__ == '__main__':
     calc = Calc(debug=0)
