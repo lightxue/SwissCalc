@@ -1,4 +1,4 @@
-If you can read Chinese, please read `doc/swisscalc.txt` in Vim.
+如果你能阅读中文，请在Vim中打开doc/swisscalc.txt阅读帮助文档。
 
 # Introduction
 
@@ -45,7 +45,7 @@ Type `:ScalcSplit` to open a new window containing the SwissCalc buffer(other
 open commands: `:Scalc`, `:ScalcVSplit`, `:ScalcTab`). SwissCalc closed when
 all SwissCalc buffer closed.SwissCalc has been tailored to act as a Read Eval
 Print Loop (REPL). That is, any command read at the prompt will be evaluated
-and the result printed back to you interactively.
+after you press `<CR>` and the result printed back to you interactively.
 
 # Data types
 
@@ -53,7 +53,9 @@ SwissCalc support three data types: integer, float and string. Integer is not
 arbitrary size, see `Environment variable`. Floating-point arithmetic is
 IEEE754, which means float evaluation is not arbitrary precision.
 
-# Operation
+![Data type](screencast_datatypes.gif)
+
+# Operations
 
     Precedence  Operator   Associativity  Description
     0           =          right          Assignment
@@ -70,6 +72,8 @@ IEEE754, which means float evaluation is not arbitrary precision.
     5           !          right          Factorial.
     6           **         left           Exponentiation.
 
+![Operations](screencast_operations.gif)
+
 # Variables
 
 You will find it is convenient to define variables when expression is
@@ -85,6 +89,8 @@ There are some built-in variables in SwissCalc.
     pi          Ratio of any circle's circumference to its diameter in
                 Euclidean space.
     phi         Golden ratio. Useful when working with Fibonacci sequences.
+
+![Variables](screencast_variables.gif)
 
 # Functions
 
@@ -118,6 +124,10 @@ SwissCalc is supplied with many built-in functions. Here are some of them.
 
     str           Convert other data type to string.
 
+![Functions](screencast-bltin-funcs1.gif)
+![Functions](screencast-bltin-funcs2.gif)
+![Functions](screencast-bltin-funcs3.gif)
+
 ## User-defined functions
 
 Define functions for SwissCalc is quite easy. Add all the functions you want to
@@ -135,22 +145,10 @@ There are something you should know before defining your own functions:
 6. Raising exceptions is valid because SwissCalc will catch all user-define
    exceptins.
 
-自定义函数写法很简单：在SwissCalc/autoload/custom.py里加上你需要的函数即可。这
-个文件里所有的函数都会在SwissCalc启动时加载。
+If you do add functions that you think others would benefit from,
+please send me patches.
 
-编写自定义函数请注意以下几点：
-
-1. 自定义函数必须由Python编写。
-
-2. 函数的参数和返回值必须是整数、浮点数、字符串三种类型之一。
-
-3. 如果你的函数加了docstring，那么用help()可以看到你的函数的文档:)。
-
-4. 你的函数从stdout输出的内容会输出到SwissCalc里。但是SwiissCalc读不到
-   stdin和stderr的内容。
-
-5. 如果自定义函数与内置函数的函数名相同，自定义函数会覆盖内置函数。
-
+![Functions](screencast-custom-funcs.gif)
 
 # Environment variables
 
@@ -166,12 +164,14 @@ variables will overwrite environment variables when they have the same name.
     word         8         Number of bytes that handling integer.
     signed       1         Whether integer is signed.
 
+![Functions](screencast-env-variables.gif)
+
 # Commands
 
-1. :Scalc
-2. :ScalcSplit
-3. :ScalcVSplit
-$. :ScalcTab
+1. :Scalc        ==> open SwissCalc in a current window
+2. :ScalcSplit   ==> open SwissCalc in a horizontal window
+3. :ScalcVSplit  ==> open SwissCalc in a vertical window
+4. :ScalcTab     ==> open SwissCalc in a new tab
 
 # Change log
 
