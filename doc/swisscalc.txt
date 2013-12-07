@@ -478,7 +478,7 @@ SwissCalc的buffer名字，这个名字不要和其它已经打开的buffer名�
 12. 更新日志                                             *swisscalc-changelog*
 
     版本      时间           描述~
-    0.1.0     2013-12-07     First release, hope you like it.
+    1.0.0     2013-12-07     First release, hope you like it.
     0.9.0     2013-11-18     Beta version.
 
 ==============================================================================

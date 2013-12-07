@@ -176,7 +176,7 @@ variables will overwrite environment variables when they have the same name.
 # Change log
 
     Version   Time           Description
-    0.1.0     2013-12-07     First release, hope you like it.
+    1.0.0     2013-12-07     First release, hope you like it.
     0.9.0     2013-11-18     Beta version.
 
 # About
