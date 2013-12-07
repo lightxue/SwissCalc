@@ -123,6 +123,9 @@ function! s:scalc_mappings() "{{{
     inoremap <buffer> <silent> <up> <C-o>:call <SID>scalc_pre_cmd()<CR>
     inoremap <buffer> <silent> <down> <C-o>:call <SID>scalc_next_cmd()<CR>
 
+    inoremap <buffer> <silent> <C-p> <C-o>:call <SID>scalc_pre_cmd()<CR>
+    inoremap <buffer> <silent> <C-n> <C-o>:call <SID>scalc_next_cmd()<CR>
+
 endfunction "}}}
 
 function! s:scalc_repl(insert_mode) "{{{
