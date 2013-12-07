@@ -176,12 +176,13 @@ variables will overwrite environment variables when they have the same name.
 # Change log
 
     Version   Time           Description
+    0.1.0     2013-12-07     First release, hope you like it.
     0.9.0     2013-11-18     Beta version.
 
 # About
 
-Author;  Light Xue
-Email:   bkmgtp@gmail.com
+Author;  Light Xue<br>
+Email:   bkmgtp@gmail.com<br>
 Website: https://github.com/lightxue/SwissCalc
 
 Contributing to SwissCalc couldn't be easier. If you wish to do development
