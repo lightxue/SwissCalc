@@ -160,6 +160,15 @@ function! s:scalc_record_cmd(expr) "{{{
 endfunction "}}}
 
 function! s:scalc_pre_cmd() "{{{
+
+    if b:scalc_history_idx == -1
+        let b:scalc_history_tmp = ""
+        let s:expr = getline(".")
+        if match(s:expr, g:scalc_prompt) == 0
+            let b:scalc_history_tmp = strpart(s:expr, matchend(s:expr, g:scalc_prompt))
+        endif
+    endif
+
     if b:scalc_history_idx < len(b:scalc_history)-1
         let b:scalc_history_idx += 1
         let failed = setline(line('$'), g:scalc_prompt . b:scalc_history[b:scalc_history_idx])
@@ -171,6 +180,10 @@ function! s:scalc_next_cmd() "{{{
     if b:scalc_history_idx > 0
         let b:scalc_history_idx -= 1
         let failed = setline(line('$'), g:scalc_prompt . b:scalc_history[b:scalc_history_idx])
+        call <SID>scalc_jump_to_prompt(1)
+    elseif b:scalc_history_idx == 0
+        let b:scalc_history_idx -= 1
+        let failed = setline(line('$'), g:scalc_prompt . b:scalc_history_tmp)
         call <SID>scalc_jump_to_prompt(1)
     endif
 endfunction "}}}
