@@ -317,9 +317,10 @@ class Calc(Parser):
                    | expression modulo expression
                    | expression power expression
         '''
-        if p[2] == '/':
-            p[0] = self.common_binops['/'](p[1], float(p[3]))
-        elif p[2] in self.common_binops:
+        if p[2] == '/' and not self._env['c-div']:
+            p[3] = float(p[3])
+
+        if p[2] in self.common_binops:
             p[0] = self.common_binops[p[2]](p[1], p[3])
         else:
             p[0] = self.int_binops[p[2]](int(p[1]), int(p[3]))
@@ -437,6 +438,7 @@ class Calc(Parser):
         self.names['pi'] = math.pi
         self.names['phi'] = 1.6180339887498948482
         self._env = {
+            'c-div'  : 1,
             'signed' : 1,
             'word'   : 8,
             'bin'    : 0,
