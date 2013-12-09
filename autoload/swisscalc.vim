@@ -58,6 +58,18 @@ function! swisscalc#ScalcNextCmd() "{{{
     call s:scalc_next_cmd()
 endfunction "}}}
 
+function! swisscalc#ScalcToggleBin() "{{{
+    py calc.execute(("setenv('bin')"))
+endfunction "}}}
+
+function! swisscalc#ScalcToggleDec() "{{{
+    py calc.execute(("setenv('dec')"))
+endfunction "}}}
+
+function! swisscalc#ScalcToggleHex() "{{{
+    py calc.execute(("setenv('hex')"))
+endfunction "}}}
+
 "}}}
 
 "{{{ Util
