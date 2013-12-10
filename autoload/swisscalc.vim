@@ -100,9 +100,6 @@ function! s:scalc_open(open_cmd) "{{{
 
     call setline(line('$'), g:scalc_prompt)
 
-    let b:scalc_history = []
-    let b:scalc_history_idx = -1
-
     call <SID>scalc_local_setting()
     call <SID>scalc_mappings()
     call <SID>scalc_jump_to_prompt(1)
@@ -123,6 +120,7 @@ function! s:scalc_local_setting() "{{{
 endfunction "}}}
 
 function! s:scalc_mappings() "{{{
+
     nnoremap <buffer> <silent> <CR> :call <SID>scalc_repl(0)<CR>
     inoremap <buffer> <silent> <CR> <C-o>:call <SID>scalc_repl(1)<CR>
 
@@ -131,16 +129,17 @@ function! s:scalc_mappings() "{{{
     nnoremap <buffer> <silent> O :call <SID>scalc_jump_to_prompt(1)<CR>
 
     " exit
-    inoremap <buffer> <silent> <C-d> <Esc>:q<CR>
+    inoremap <buffer> <silent> <C-D> <Esc>:q<CR>
 
     " help
     nnoremap <buffer> <silent> <F1> :help swisscalc-usage<CR>
 
     " history
-    inoremap <buffer> <silent> <up> <C-o>:call <SID>scalc_pre_cmd()<CR>
-    inoremap <buffer> <silent> <down> <C-o>:call <SID>scalc_next_cmd()<CR>
-    inoremap <buffer> <silent> <C-p> <C-o>:call <SID>scalc_pre_cmd()<CR>
-    inoremap <buffer> <silent> <C-n> <C-o>:call <SID>scalc_next_cmd()<CR>
+    inoremap <buffer> <silent> <up> <C-o>:py his.pre_cmd()<CR>
+    inoremap <buffer> <silent> <down> <C-o>:py his.next_cmd()<CR>
+
+    inoremap <buffer> <silent> <C-P> <C-o>:py his.pre_cmd()<CR>
+    inoremap <buffer> <silent> <C-N> <C-o>:py his.next_cmd()<CR>
 
 endfunction "}}}
 
@@ -153,55 +152,13 @@ function! s:scalc_repl(insert_mode) "{{{
 
     let s:expr = strpart(s:expr, matchend(s:expr, g:scalc_prompt))
 
-    call <SID>scalc_record_cmd(s:expr)
+    py his.record_cmd(vim.eval('s:expr'))
     py repl(vim.eval('s:expr'))
 
     let failed = append(line('$'), g:scalc_prompt)
 
-    let b:scalc_history_idx = -1
-
     call <SID>scalc_jump_to_prompt(a:insert_mode)
 
-endfunction "}}}
-
-"}}}
-
-"{{{ History
-
-function! s:scalc_record_cmd(expr) "{{{
-    call insert(b:scalc_history, a:expr)
-    if len(b:scalc_history) > g:scalc_max_history
-        call remove(b:scalc_history, -1)
-    endif
-endfunction "}}}
-
-function! s:scalc_pre_cmd() "{{{
-
-    if b:scalc_history_idx == -1
-        let b:scalc_history_tmp = ""
-        let s:expr = getline(".")
-        if match(s:expr, g:scalc_prompt) == 0
-            let b:scalc_history_tmp = strpart(s:expr, matchend(s:expr, g:scalc_prompt))
-        endif
-    endif
-
-    if b:scalc_history_idx < len(b:scalc_history)-1
-        let b:scalc_history_idx += 1
-        let failed = setline(line('$'), g:scalc_prompt . b:scalc_history[b:scalc_history_idx])
-        call <SID>scalc_jump_to_prompt(1)
-    endif
-endfunction "}}}
-
-function! s:scalc_next_cmd() "{{{
-    if b:scalc_history_idx > 0
-        let b:scalc_history_idx -= 1
-        let failed = setline(line('$'), g:scalc_prompt . b:scalc_history[b:scalc_history_idx])
-        call <SID>scalc_jump_to_prompt(1)
-    elseif b:scalc_history_idx == 0
-        let b:scalc_history_idx -= 1
-        let failed = setline(line('$'), g:scalc_prompt . b:scalc_history_tmp)
-        call <SID>scalc_jump_to_prompt(1)
-    endif
 endfunction "}}}
 
 "}}}
@@ -214,8 +171,10 @@ python << EOF
 
 import vim
 import swisscalc
+import history
 
 calc = swisscalc.Calc(vim.eval('s:script_path'))
+his = history.History()
 
 # function list
 funcs = r'\|'.join(r'\<%s\>' % func for func in calc.funcs)
