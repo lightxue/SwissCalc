@@ -44,13 +44,19 @@ if !exists("g:scalc_max_history")
     let g:scalc_max_history = 1024
 endif
 if !exists("g:scalc_save_history")
-    let g:scalc_have_history = 1
+    let g:scalc_save_history = 1
+endif
+if !exists("g:scalc_save_session")
+    let g:scalc_save_session = 1
 endif
 "}}}
 
 "{{{ event registe
 exe 'au BufNewFile '. g:scalc_title . ' py his.load_cmds()'
 exe 'au VimLeave,BufLeave '. g:scalc_title . ' py his.save_cmds()'
+
+exe 'au BufNewFile '. g:scalc_title . ' py his.load_session([calc.names, calc._env])'
+exe 'au VimLeave,BufLeave '. g:scalc_title . ' py his.save_session([calc.names, calc._env])'
 "}}}
 
 "}}}

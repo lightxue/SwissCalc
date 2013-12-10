@@ -22,6 +22,7 @@ class History(object):
         self.prompt = vim.vars['scalc_prompt']
         self.path = path
         self.history_path = os.path.join(path, 'history')
+        self.session_path = os.path.join(path, 'session')
 
     def jump_to_prompt(self, insert_mode):
         last = vim.current.buffer[-1]
@@ -69,22 +70,50 @@ class History(object):
         self.jump_to_prompt(True)
 
     def save_cmds(self):
-        if not vim.vars['scalc_have_history']:
+        if not vim.vars['scalc_save_history']:
             return
-        with open(self.history_path, 'w') as fd:
-            try:
-                json.dump(self.cmds, fd, sort_keys=True, indent=4, separators=(',', ': '))
-            except:
-                pass
+        try:
+            fd = open(self.history_path, 'w')
+            json.dump(self.cmds, fd, sort_keys=True, indent=4, separators=(',', ': '))
+            fd.close()
+        except:
+            pass
 
     def load_cmds(self):
-        if not vim.vars['scalc_have_history']:
+        if not vim.vars['scalc_save_history']:
             return
-        with open(self.history_path) as fd:
-            try:
-                self.cmds = json.load(fd)
-            except:
-                self.cmds = []
-            finally:
-                self.cmd_tmp = ''
-                self.cmd_idx = len(self.cmds)
+
+        try:
+            fd = open(self.history_path)
+            self.cmds = json.load(fd, 'utf-8')
+            fd.close()
+        except:
+            self.cmds = []
+        finally:
+            # do some check
+            self.cmd_tmp = ''
+            self.cmd_idx = len(self.cmds)
+
+    def save_session(self, session):
+        if not vim.vars['scalc_save_session']:
+            return
+        try:
+            fd = open(self.session_path, 'w')
+            json.dump(session, fd, sort_keys=True, indent=4, separators=(',', ': '))
+            fd.close()
+        except:
+            pass
+
+    def load_session(self, session):
+        if not vim.vars['scalc_save_session']:
+            return
+        try:
+            fd = open(self.session_path)
+            tmp  = json.load(fd, 'utf-8')
+            fd.close()
+        except:
+            tmp = session
+        finally:
+            # do some check
+            session[0].update(tmp[0])
+            session[1].update(tmp[1])
