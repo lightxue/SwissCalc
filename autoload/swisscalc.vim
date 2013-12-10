@@ -43,6 +43,14 @@ endif
 if !exists("g:scalc_max_history")
     let g:scalc_max_history = 1024
 endif
+if !exists("g:scalc_save_history")
+    let g:scalc_have_history = 1
+endif
+"}}}
+
+"{{{ event registe
+exe 'au BufNewFile '. g:scalc_title . ' py his.load_cmds()'
+exe 'au VimLeave,BufLeave '. g:scalc_title . ' py his.save_cmds()'
 "}}}
 
 "}}}
@@ -83,7 +91,7 @@ function! s:scalc_open(open_cmd) "{{{
 
     call <SID>scalc_local_setting()
     call <SID>scalc_mappings()
-    call <SID>scalc_jump_to_prompt(1)
+    py his.jump_to_prompt(True)
 endfunction
 "}}}
 
@@ -137,7 +145,7 @@ import swisscalc
 import history
 
 calc = swisscalc.Calc(vim.eval('s:script_path'))
-his = history.History()
+his = history.History(vim.eval('s:script_path'))
 
 # function list
 funcs = r'\|'.join(r'\<%s\>' % func for func in calc.funcs)

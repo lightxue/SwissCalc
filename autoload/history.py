@@ -7,18 +7,21 @@
 # Website: https://github.com/lightxue/SwissCalc
 
 import vim
+import os
 import json
 
 class History(object):
     '''
     Reord history command and sessions
     '''
-    def __init__(self):
+    def __init__(self, path):
         self.cmds = []
         self.cmd_idx = 0
         self.cmd_tmp = ''
         self.cmd_max = vim.vars['scalc_max_history']
         self.prompt = vim.vars['scalc_prompt']
+        self.path = path
+        self.history_path = os.path.join(path, 'history')
 
     def jump_to_prompt(self, insert_mode):
         last = vim.current.buffer[-1]
@@ -64,3 +67,24 @@ class History(object):
             self.cmd_idx += 1
             vim.current.line = self.prompt + self.cmds[self.cmd_idx]
         self.jump_to_prompt(True)
+
+    def save_cmds(self):
+        if not vim.vars['scalc_have_history']:
+            return
+        with open(self.history_path, 'w') as fd:
+            try:
+                json.dump(self.cmds, fd, sort_keys=True, indent=4, separators=(',', ': '))
+            except:
+                pass
+
+    def load_cmds(self):
+        if not vim.vars['scalc_have_history']:
+            return
+        with open(self.history_path) as fd:
+            try:
+                self.cmds = json.load(fd)
+            except:
+                self.cmds = []
+            finally:
+                self.cmd_tmp = ''
+                self.cmd_idx = len(self.cmds)
