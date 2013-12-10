@@ -131,7 +131,7 @@ function! s:scalc_mappings() "{{{
     nnoremap <buffer> <silent> O :call <SID>scalc_jump_to_prompt(1)<CR>
 
     " exit
-    inoremap <buffer> <silent> <C-d> <C-o>:q<CR>
+    inoremap <buffer> <silent> <C-d> <Esc>:q<CR>
 
     " help
     nnoremap <buffer> <silent> <F1> :help swisscalc-usage<CR>
