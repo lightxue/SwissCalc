@@ -218,15 +218,15 @@ import swisscalc
 calc = swisscalc.Calc(vim.eval('s:script_path'))
 
 # function list
-funcs = r'\\|'.join(r'\\<%s\\>' % func for func in calc.funcs)
-vim.command('let g:scalc_funcs = "%s"' % funcs)
+funcs = r'\|'.join(r'\<%s\>' % func for func in calc.funcs)
+vim.vars['scalc_funcs'] = funcs
 
 # operator list
-ops = ['+', '-', r'\\*', '/', '%', r'\\*\\*', '!', '<<', '>>', '&',
-       r'\\~', '|', r'\\^', '=', '+=', '-=', r'\\*=', '/=', '%=',
-       r'\\*\\*=', '<<=', '>>=', '&=', '|=', r'\\^=']
-ops = r'\\|'.join(ops)
-vim.command('let g:scalc_ops = "%s"' % ops)
+ops = ['+', '-', r'\*', '/', '//', '%', r'\*\*', '!', '<<', '>>', '&',
+       r'\~', '|', r'\^', '=', '+=', '-=', r'\*=', '/=', '%=',
+       r'\*\*=', '<<=', '>>=', '&=', '|=', r'\^=']
+ops = r'\|'.join(ops)
+vim.vars['scalc_ops'] = ops
 
 def repl(expr):
     expr = expr.strip()
