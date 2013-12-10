@@ -108,7 +108,7 @@ class Calc(Parser):
         'binint', 'octint', 'hexint', 'decint',
         'string',
         'pointfloat', 'exponentfloat',
-        'add', 'subtract', 'multiply', 'divide',
+        'add', 'subtract', 'multiply', 'divide', 'floordiv',
         'modulo', 'power', 'factorial',
         'lshift', 'rshift', 'and', 'not', 'or', 'xor',
         'assign',
@@ -129,6 +129,7 @@ class Calc(Parser):
     t_add        = r'\+'
     t_subtract   = r'-'
     t_multiply   = r'\*'
+    t_floordiv   = r'//'
     t_divide     = r'/'
     t_modulo     = r'%'
     t_power      = r'\*\*'
@@ -221,7 +222,7 @@ class Calc(Parser):
         ('left', 'and', 'or', 'xor'),
         ('left', 'lshift', 'rshift'),
         ('left', 'add', 'subtract'),
-        ('left', 'multiply', 'divide', 'modulo'),
+        ('left', 'multiply', 'divide', 'modulo', 'floordiv'),
         ('right','usub', 'uadd', 'not'),
         ('left', 'factorial'),
         ('left', 'power'),
@@ -245,6 +246,7 @@ class Calc(Parser):
         '-'   : operator.sub,
         '*'   : operator.mul,
         '/'   : operator.div,
+        '//'  : operator.floordiv,
         '%'   : operator.mod,
         '**'  : operator.pow,
         '+='  : operator.iadd,
@@ -309,6 +311,7 @@ class Calc(Parser):
                    | expression subtract expression
                    | expression multiply expression
                    | expression divide expression
+                   | expression floordiv expression
                    | expression or expression
                    | expression xor expression
                    | expression and expression
