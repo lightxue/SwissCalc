@@ -26,7 +26,10 @@ else
         echomsg "SwissCalc unavailable: requires Python2.7+"
         echohl None
     endfunction
-    command! -nargs=0 SCalc call s:ScalcDidNotLoad()
+    command! -nargs=0 SCalc       call s:ScalcDidNotLoad()
+    command! -nargs=0 SCalcSplit  call s:ScalcDidNotLoad()
+    command! -nargs=0 SCalcVSplit call s:ScalcDidNotLoad()
+    command! -nargs=0 SCalcTab    call s:ScalcDidNotLoad()
     finish
 endif "}}}
 
@@ -38,7 +41,7 @@ if !exists("g:scalc_prompt")
     let g:scalc_prompt = "> "
 endif
 if !exists("g:scalc_max_history")
-    let g:scalc_max_history = 256
+    let g:scalc_max_history = 1024
 endif
 "}}}
 
@@ -48,14 +51,6 @@ endif
 
 function! swisscalc#ScalcOpen(open_cmd) "{{{
     call s:scalc_open(a:open_cmd)
-endfunction "}}}
-
-function! swisscalc#ScalcPreCmd() "{{{
-    call s:scalc_pre_cmd()
-endfunction "}}}
-
-function! swisscalc#ScalcNextCmd() "{{{
-    call s:scalc_next_cmd()
 endfunction "}}}
 
 function! swisscalc#ScalcToggleBin() "{{{
@@ -68,20 +63,6 @@ endfunction "}}}
 
 function! swisscalc#ScalcToggleHex() "{{{
     py calc.execute(("setenv('hex')"))
-endfunction "}}}
-
-"}}}
-
-"{{{ Util
-
-function! s:scalc_jump_to_prompt(insert_mode) "{{{
-    if match(getline('$'), g:scalc_prompt) != 0
-        call append(line('$'), g:scalc_prompt)
-    endif
-    call setpos(".", [0, line('$'), col('$'), 0])
-    if a:insert_mode == 1
-        startinsert!
-    endif
 endfunction "}}}
 
 "}}}
@@ -121,8 +102,8 @@ endfunction "}}}
 
 function! s:scalc_mappings() "{{{
 
-    nnoremap <buffer> <silent> <CR> :call <SID>scalc_repl(0)<CR>
-    inoremap <buffer> <silent> <CR> <C-o>:call <SID>scalc_repl(1)<CR>
+    nnoremap <buffer> <silent> <CR> :py repl(0)<CR>
+    inoremap <buffer> <silent> <CR> <C-o>:py repl(1)<CR>
 
     " inserting a new line jumps to the prompt
     nnoremap <buffer> <silent> o :call <SID>scalc_jump_to_prompt(1)<CR>
@@ -140,24 +121,6 @@ function! s:scalc_mappings() "{{{
 
     inoremap <buffer> <silent> <C-P> <C-o>:py his.pre_cmd()<CR>
     inoremap <buffer> <silent> <C-N> <C-o>:py his.next_cmd()<CR>
-
-endfunction "}}}
-
-function! s:scalc_repl(insert_mode) "{{{
-
-    let s:expr = getline(".")
-    if match(s:expr, g:scalc_prompt) != 0
-        return
-    endif
-
-    let s:expr = strpart(s:expr, matchend(s:expr, g:scalc_prompt))
-
-    py his.record_cmd(vim.eval('s:expr'))
-    py repl(vim.eval('s:expr'))
-
-    let failed = append(line('$'), g:scalc_prompt)
-
-    call <SID>scalc_jump_to_prompt(a:insert_mode)
 
 endfunction "}}}
 
@@ -187,18 +150,31 @@ ops = ['+', '-', r'\*', '/', '//', '%', r'\*\*', '!', '<<', '>>', '&',
 ops = r'\|'.join(ops)
 vim.vars['scalc_ops'] = ops
 
-def repl(expr):
-    expr = expr.strip()
-    if not expr:
-        return
-    result = calc.execute(expr)
-    if not result:
-        return
-    for line in result.split('\n'):
-        vim.current.buffer.append(line + '\n')
+def repl(insert_mode):
+    line = vim.current.line
+    prompt = vim.vars['scalc_prompt']
+
+    while True:
+        if not line.startswith(prompt):
+            break
+
+        expr = line[len(prompt):].strip()
+        if not expr:
+            break
+
+        his.record_cmd(expr)
+        result = calc.execute(expr)
+        if not result:
+            break
+        for line in result.split('\n'):
+            vim.current.buffer.append(line + '\n')
+
+    vim.current.buffer.append(prompt)
+    his.jump_to_prompt(insert_mode)
+
 EOF
 
-endif
+endif " has('python')
 
 "}}}
 

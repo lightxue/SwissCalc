@@ -31,6 +31,7 @@ class History(object):
     def record_cmd(self, expr):
         if not expr.strip():
             return
+
         self.cmds.append(expr)
         if len(self.cmds) > self.cmd_max:
             self.cmds = self.cmds[-self.cmd_max:]
