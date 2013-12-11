@@ -18,8 +18,10 @@ class History(object):
         self.cmds = []
         self.cmd_idx = 0
         self.cmd_tmp = ''
-        self.cmd_max = vim.vars['scalc_max_history']
-        self.prompt = vim.vars['scalc_prompt']
+        self.cmd_max = vim.eval('g:scalc_max_history')
+        self.prompt = vim.eval('g:scalc_prompt')
+        self.is_save_history = vim.eval('scalc_save_history')
+        self.is_save_session = vim.eval('scalc_save_session')
         self.path = path
         self.history_path = os.path.join(path, 'history')
         self.session_path = os.path.join(path, 'session')
@@ -70,7 +72,7 @@ class History(object):
         self.jump_to_prompt(True)
 
     def save_cmds(self):
-        if not vim.vars['scalc_save_history']:
+        if not self.is_save_history:
             return
         try:
             fd = open(self.history_path, 'w')
@@ -80,7 +82,7 @@ class History(object):
             pass
 
     def load_cmds(self):
-        if not vim.vars['scalc_save_history']:
+        if not self.is_save_history:
             return
 
         try:
@@ -95,7 +97,7 @@ class History(object):
             self.cmd_idx = len(self.cmds)
 
     def save_session(self, session):
-        if not vim.vars['scalc_save_session']:
+        if not self.is_save_session:
             return
         try:
             fd = open(self.session_path, 'w')
@@ -105,7 +107,7 @@ class History(object):
             pass
 
     def load_session(self, session):
-        if not vim.vars['scalc_save_session']:
+        if not self.is_save_session:
             return
         try:
             fd = open(self.session_path)

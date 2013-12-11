@@ -154,19 +154,19 @@ calc = swisscalc.Calc(vim.eval('s:script_path'))
 his = history.History(vim.eval('s:script_path'))
 
 # function list
-funcs = r'\|'.join(r'\<%s\>' % func for func in calc.funcs)
-vim.vars['scalc_funcs'] = funcs
+funcs = r'\\|'.join(r'\\<%s\\>' % func for func in calc.funcs)
+vim.command('let g:scalc_funcs = "%s"' % funcs)
 
 # operator list
-ops = ['+', '-', r'\*', '/', '//', '%', r'\*\*', '!', '<<', '>>', '&',
-       r'\~', '|', r'\^', '=', '+=', '-=', r'\*=', '/=', '%=',
-       r'\*\*=', '<<=', '>>=', '&=', '|=', r'\^=']
-ops = r'\|'.join(ops)
-vim.vars['scalc_ops'] = ops
+ops = ['+', '-', r'\\*', '/', '%', r'\\*\\*', '!', '<<', '>>', '&',
+       r'\\~', '|', r'\\^', '=', '+=', '-=', r'\\*=', '/=', '%=',
+       r'\\*\\*=', '<<=', '>>=', '&=', '|=', r'\\^=']
+ops = r'\\|'.join(ops)
+vim.command('let g:scalc_ops = "%s"' % ops)
 
 def repl(insert_mode):
     line = vim.current.line
-    prompt = vim.vars['scalc_prompt']
+    prompt = vim.eval('g:scalc_prompt')
 
     while True:
         if not line.startswith(prompt):
