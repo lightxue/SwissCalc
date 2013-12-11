@@ -10,6 +10,8 @@ import vim
 import os
 import json
 
+ENCODEING = 'utf-8'
+
 class History(object):
     '''
     Reord history command and sessions
@@ -76,7 +78,8 @@ class History(object):
             return
         try:
             fd = open(self.history_path, 'w')
-            json.dump(self.cmds, fd, sort_keys=True, indent=4, separators=(',', ': '))
+            json.dump(self.cmds, fd, sort_keys=True,
+                      indent=4, separators=(',', ': '))
             fd.close()
         except:
             pass
@@ -87,12 +90,11 @@ class History(object):
 
         try:
             fd = open(self.history_path)
-            self.cmds = json.load(fd, 'utf-8')
+            self.cmds = json.load(fd, ENCODEING)
             fd.close()
         except:
             self.cmds = []
         finally:
-            # do some check
             self.cmd_tmp = ''
             self.cmd_idx = len(self.cmds)
 
@@ -101,7 +103,8 @@ class History(object):
             return
         try:
             fd = open(self.session_path, 'w')
-            json.dump(session, fd, sort_keys=True, indent=4, separators=(',', ': '))
+            json.dump(session, fd, sort_keys=True,
+                      indent=4, separators=(',', ': '))
             fd.close()
         except:
             pass
@@ -111,11 +114,13 @@ class History(object):
             return
         try:
             fd = open(self.session_path)
-            tmp  = json.load(fd, 'utf-8')
+            tmp  = json.load(fd, ENCODEING)
             fd.close()
+
+            for t, s in zip(tmp, session):
+                for k, v in t.iteritems():
+                    if isinstance(v, unicode):
+                        v = v.encode(ENCODEING)
+                    s[k] = v
         except:
-            tmp = session
-        finally:
-            # do some check
-            session[0].update(tmp[0])
-            session[1].update(tmp[1])
+            pass

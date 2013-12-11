@@ -175,6 +175,9 @@ def repl(insert_mode):
         expr = line[len(prompt):].strip()
         if not expr:
             break
+        elif expr == 'exit':
+            vim.command('exit')
+            return
 
         his.record_cmd(expr)
         result = calc.execute(expr)
