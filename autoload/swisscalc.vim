@@ -176,6 +176,7 @@ def repl(insert_mode):
         if not expr:
             break
         elif expr == 'exit':
+            vim.command('stopinsert')
             vim.command('exit')
             return
 
