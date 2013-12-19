@@ -120,8 +120,8 @@ function! s:scalc_mappings() "{{{
     inoremap <buffer> <silent> <CR> <C-o>:py repl(1)<CR>
 
     " inserting a new line jumps to the prompt
-    nnoremap <buffer> <silent> o :call <SID>scalc_jump_to_prompt(1)<CR>
-    nnoremap <buffer> <silent> O :call <SID>scalc_jump_to_prompt(1)<CR>
+    nnoremap <buffer> <silent> o :py his.jump_to_prompt(True)<CR>
+    nnoremap <buffer> <silent> O :py his.jump_to_prompt(True)<CR>
 
     " exit
     inoremap <buffer> <silent> <C-D> <Esc>:q<CR>
