@@ -251,7 +251,7 @@ def hex(x):
 
     Print hexadecimal representation of integer or string
     '''
-    if isinstance(x ,(int, long)):
+    if isinstance(x, (int, long)):
         print '0x{0:x}'.format(x)
     elif isinstance(x, float):
         import struct
@@ -267,6 +267,24 @@ def hex(x):
         print('\n'.join(' '.join(line) for line in r))
     else:
         raise Exception("type: %s argument can't be converted to hex" % (type(x)))
+
+def hex2float(n):
+    '''
+    hex2float(n)
+
+    convent n to 4 bytes IEEE floating point
+    '''
+    import struct
+    return struct.unpack('!f', struct.pack('!I', n))[0]
+
+def hex2double(n):
+    '''
+    hex2double(n)
+
+    convent n to 8 bytes IEEE floating point
+    '''
+    import struct
+    return struct.unpack('!d', struct.pack('!Q', n))[0]
 
 def ssize(n):
     '''
