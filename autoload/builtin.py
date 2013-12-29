@@ -252,16 +252,21 @@ def hex(x):
     Print hexadecimal representation of integer or string
     '''
     if isinstance(x ,(int, long)):
-        s = '0x{0:x}'.format(x)
-        return s
+        print '0x{0:x}'.format(x)
+    elif isinstance(x, float):
+        import struct
+        f = struct.unpack('!I', struct.pack('!f', x))[0]
+        d = struct.unpack('!Q', struct.pack('!d', x))[0]
+        print 'float:', '0x{0:x}'.format(f)
+        print 'double:', '0x{0:x}'.format(d)
     elif isinstance(x, str):
         s = x.encode('hex')
+        r = [s[i:i+2] for i in xrange(0, len(s), 2)]
+        r = [r[i:i+8] for i in xrange(0, len(r), 8)]
+        print 'hex: ' # for high light
+        print('\n'.join(' '.join(line) for line in r))
     else:
         raise Exception("type: %s argument can't be converted to hex" % (type(x)))
-    r = [s[i:i+2] for i in xrange(0, len(s), 2)]
-    r = [r[i:i+8] for i in xrange(0, len(r), 8)]
-    print 'hex: '
-    print('\n'.join(' '.join(line) for line in r))
 
 def ssize(n):
     '''
