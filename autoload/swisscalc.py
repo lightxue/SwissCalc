@@ -378,6 +378,18 @@ class Calc(Parser):
         'expression : lparen expression rparen'
         p[0] = p[2]
 
+    scales = 'kmgtpezy'
+    def p_expression_scales(self, p):
+        '''
+        expression : integer ident
+                   | float  ident
+        '''
+        scale = p[2].lower()
+        if len(scale) != 1 or scale not in self.scales:
+            raise SyntaxError('invalid identifier: %s%s' % (p[1], p[2]))
+        idx = self.scales.index(scale) + 1
+        p[0] = p[1] * (10 ** (idx * 3))
+
     def p_expression_str(self, p):
         '''
         expression : string

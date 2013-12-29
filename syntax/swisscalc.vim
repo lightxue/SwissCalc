@@ -38,13 +38,13 @@ syn match scalc_escape    "\\$"
 "}}}
 
 "{{{ Number
-syn match scalc_num    "\<0[oO]\=\o\+\>"
-syn match scalc_num    "\<0[xX]\x\+\>"
-syn match scalc_num    "\<0[bB][01]\+\>"
-syn match scalc_num    "\<\%([1-9]\d*\|0\)\>"
-syn match scalc_num    "\<\d\+[eE][+-]\=\d\+\>"
-syn match scalc_num    "\<\d\+\.\%([eE][+-]\=\d\+\)\=\%(\W\|$\)\@="
-syn match scalc_num    "\%(^\|\W\)\@<=\d*\.\d\+\%([eE][+-]\=\d\+\)\=\>"
+syn match scalc_num    "\<0[oO]\=\o\+[kmgtpezyKMGTPEZY]\?\>"
+syn match scalc_num    "\<0[xX]\x\+[kmgtpezyKMGTPEZY]\?\>"
+syn match scalc_num    "\<0[bB][01]\+[kmgtpezyKMGTPEZY]\?\>"
+syn match scalc_num    "\<\%([1-9]\d*\|0\)[kmgtpezyKMGTPEZY]\?\>"
+syn match scalc_num    "\<\d\+[eE][+-]\=\d\+[kmgtpezyKMGTPEZY]\?\>"
+syn match scalc_num    "\<\d\+\.\%([eE][+-]\=\d\+\)\=\%(\W\|$\)\@=[kmgtpezyKMGTPEZY]\?"
+syn match scalc_num    "\%(^\|\W\)\@<=\d*\.\d\+\%([eE][+-]\=\d\+\)\=[kmgtpezyKMGTPEZY]\?\>"
 "}}}
 
 "{{{ Delim
