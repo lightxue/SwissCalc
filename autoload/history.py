@@ -82,7 +82,6 @@ class History(object):
                       indent=4, separators=(',', ': '))
             fd.close()
         except:
-            raise
             pass
 
     def load_cmds(self):
@@ -91,11 +90,11 @@ class History(object):
 
         try:
             fd = open(self.history_path)
-            self.cmds = json.load(fd, ENCODEING)
+            cmds = json.load(fd, ENCODEING)
+            self.cmds = [c.encode(ENCODEING) for c in cmds]
             fd.close()
         except:
             self.cmds = []
-            raise
         finally:
             self.cmd_tmp = ''
             self.cmd_idx = len(self.cmds)
@@ -109,7 +108,6 @@ class History(object):
                       indent=4, separators=(',', ': '))
             fd.close()
         except:
-            raise
             pass
 
     def load_session(self, session):
@@ -126,5 +124,4 @@ class History(object):
                         v = v.encode(ENCODEING)
                     s[k] = v
         except:
-            raise
             pass
