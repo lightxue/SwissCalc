@@ -72,7 +72,7 @@ def md5(s):
     Return the md5 digest value of s as string of hexadecimal digits
     '''
     m = hashlib.md5()
-    m.update(s)
+    m.update(s.encode())
     return m.hexdigest()
 
 def sha1(s):
@@ -82,7 +82,7 @@ def sha1(s):
     Return the sha1 digest value of s as string of hexadecimal digits
     '''
     sha = hashlib.sha1()
-    sha.update(s)
+    sha.update(s.encode())
     return sha.hexdigest()
 
 def sha224(s):
@@ -92,7 +92,7 @@ def sha224(s):
     Return the sha224 digest value of s as string of hexadecimal digits
     '''
     sha = hashlib.sha224()
-    sha.update(s)
+    sha.update(s.encode())
     return sha.hexdigest()
 
 def sha256(s):
@@ -102,7 +102,7 @@ def sha256(s):
     Return the sha256 digest value of s as string of hexadecimal digits
     '''
     sha = hashlib.sha256()
-    sha.update(s)
+    sha.update(s.encode())
     return sha.hexdigest()
 
 def sha384(s):
@@ -112,7 +112,7 @@ def sha384(s):
     Return the sha384 digest value of s as string of hexadecimal digits
     '''
     sha = hashlib.sha384()
-    sha.update(s)
+    sha.update(s.encode())
     return sha.hexdigest()
 
 def sha512(s):
@@ -122,7 +122,7 @@ def sha512(s):
     Return the sha512 digest value of s as string of hexadecimal digits
     '''
     sha = hashlib.sha512()
-    sha.update(s)
+    sha.update(s.encode())
     return sha.hexdigest()
 
 def b64enc(s):
@@ -132,7 +132,7 @@ def b64enc(s):
     Return the base64 encode string of s
     '''
     import base64
-    return base64.b64encode(s)
+    return base64.b64encode(s.encode())
 
 def b64dec(s):
     '''
@@ -141,7 +141,7 @@ def b64dec(s):
     Return the base64 decode string of s
     '''
     import base64
-    return base64.b64decode(s)
+    return base64.b64decode(s.encode())
 
 def uesc(s, encoding='utf-8'):
     '''

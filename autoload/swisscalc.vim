@@ -15,15 +15,15 @@ if version < 700 "{{{
     finish
 endif "}}}
 
-if has('python') "{{{
+if has('python3') "{{{
     let s:script_path = expand("<sfile>:h")
-    py import sys
-    py sys.path.append(vim.eval('s:script_path'))
+    py3 import sys
+    py3 sys.path.append(vim.eval('s:script_path'))
 
 else
     function! s:ScalcDidNotLoad()
         echohl WarningMsg
-        echomsg "SwissCalc unavailable: requires Python2.7+"
+        echomsg "SwissCalc unavailable: requires Python3.6+"
         echohl None
     endfunction
     command! -nargs=0 SCalc       call s:ScalcDidNotLoad()
@@ -140,11 +140,11 @@ endfunction "}}}
 
 "}}}
 
-"{{{ Python
+"{{{ Python3
 
-if has('python')
+if has('python3')
 
-python << EOF
+python3 << EOF
 
 import vim
 import swisscalc
@@ -185,14 +185,14 @@ def repl(insert_mode):
         if not result:
             break
         for line in result.split('\n'):
-            vim.current.buffer.append(line + '\n')
+            vim.current.buffer.append(line)
 
     vim.current.buffer.append(prompt)
     his.jump_to_prompt(insert_mode)
 
 EOF
 
-endif " has('python')
+endif " has('python3')
 
 "}}}
 

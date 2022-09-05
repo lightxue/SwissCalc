@@ -20,7 +20,7 @@ class History(object):
         self.cmds = []
         self.cmd_idx = 0
         self.cmd_tmp = ''
-        self.cmd_max = vim.eval('g:scalc_max_history')
+        self.cmd_max = int(vim.eval('g:scalc_max_history'))
         self.prompt = vim.eval('g:scalc_prompt')
         self.is_save_history = vim.eval('scalc_save_history')
         self.is_save_session = vim.eval('scalc_save_session')
