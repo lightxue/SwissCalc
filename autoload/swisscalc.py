@@ -20,7 +20,7 @@ import math
 import operator
 import builtin
 import custom
-import cStringIO
+from io import StringIO
 
 class SyntaxError(Exception): pass
 
@@ -59,23 +59,23 @@ class Parser(object):
         if not s:
             return
         try:
-            sys.stdout = mystdout = cStringIO.StringIO()
+            sys.stdout = mystdout = StringIO()
             self.exeval = ''
             yacc.parse(s)
+
+            sys.stdout = sys.__stdout__
+            outstr = mystdout.getvalue()
+
+            if not outstr:
+                return self.exeval
+            elif self.exeval == '' and outstr.endswith('\n'):
+                return outstr[:-1]
+            else:
+                return outstr + '\n' + self.exeval
         except SyntaxError as err:
             self.exeval = 'SyntaxError: %s' % (err)
         except Exception as err:
             self.exeval = 'RuntimeError: %s' % (err)
-
-        sys.stdout = sys.__stdout__
-        outstr = mystdout.getvalue()
-
-        if not outstr:
-            return self.exeval
-        elif self.exeval == '' and outstr.endswith('\n'):
-            return outstr[:-1]
-        else:
-            return outstr + '\n' + self.exeval
 
     def run(self):
         while 1:
@@ -176,7 +176,7 @@ class Calc(Parser):
         if t.value[0] in 'rR':
             t.value = t.value[2:-1]
         else:
-            t.value = t.value[1:-1].decode('string-escape')
+            t.value = t.value[1:-1].encode().decode('unicode_escape')
         return t
 
     def t_exponentfloat(self, t):
@@ -232,7 +232,7 @@ class Calc(Parser):
         '''statement : expression'''
         if p[1] is None:
             return
-        if isinstance(p[1], (int, long)):
+        if isinstance(p[1], int):
             p[1] = self.truncint(p[1])
         self.names['_'] = p[1]
         self.exeval = self.repr_result(p[1])
@@ -245,14 +245,14 @@ class Calc(Parser):
         '+'   : operator.add,
         '-'   : operator.sub,
         '*'   : operator.mul,
-        '/'   : operator.div,
+        '/'   : operator.truediv,
         '//'  : operator.floordiv,
         '%'   : operator.mod,
         '**'  : operator.pow,
         '+='  : operator.iadd,
         '-='  : operator.isub,
         '*='  : operator.imul,
-        '/='  : operator.idiv,
+        '/='  : operator.itruediv,
         '%='  : operator.imod,
         '**=' : operator.ipow,
     }
@@ -300,7 +300,7 @@ class Calc(Parser):
         else:
             p[0] = self.int_binops[p[2]](int(var), int(p[3]))
 
-        if isinstance(p[0], (int, long)):
+        if isinstance(p[0], int):
             p[0] = self.truncint(p[0])
 
         self.names[p[1]] = p[0]
@@ -468,15 +468,15 @@ class Calc(Parser):
         length = 8 * word
         s = '{0:0{width}b}'.format(integer, width=length)
         # 8 bits a byte
-        r = [s[i:i+8] for i in xrange(0, len(s), 8)]
+        r = [s[i:i+8] for i in range(0, len(s), 8)]
         # 8 bytes a line
-        r = [r[i:i+8] for i in xrange(0, len(r), 8)]
+        r = [r[i:i+8] for i in range(0, len(r), 8)]
         return 'bin: ' + '\n     '.join(' '.join(line) for line in r)
 
     def oct_int(self, integer):
         return 'oct: {0:o}'.format(integer)
 
-    def dec_int(slef, integer):
+    def dec_int(self, integer):
         return ('dec: %d' % integer).replace('L', '')
 
     def hex_int(self, integer):
@@ -485,9 +485,9 @@ class Calc(Parser):
         length = 2 * word
         s = '{0:0{width}x}'.format(integer, width=length)
         # 2 digit a byte
-        r = [s[i:i+2] for i in xrange(0, len(s), 2)]
+        r = [s[i:i+2] for i in range(0, len(s), 2)]
         # 8 bytes a line
-        r = [r[i:i+8] for i in xrange(0, len(r), 8)]
+        r = [r[i:i+8] for i in range(0, len(r), 8)]
         return 'hex: ' + '\n     '.join(' '.join(line) for line in r)
 
     def repr_result(self, result):
@@ -503,10 +503,7 @@ class Calc(Parser):
         return '\n'.join(res)
 
     def repr_kv(self, key, val):
-        if isinstance(val, long):
-            val = repr(val).replace('L', '')
-        else:
-            val = repr(val)
+        val = repr(val)
         return '%s = %s' % (key, val)
 
     def show_names(self):
@@ -515,7 +512,7 @@ class Calc(Parser):
 
         Print all variables
         '''
-        for name, value in self.names.iteritems():
+        for name, value in self.names.items():
             print(self.repr_kv(name, value))
 
     def show_funcs(self):
@@ -545,7 +542,7 @@ class Calc(Parser):
 
         Print interal environment variables
         '''
-        names = self._env.keys()
+        names = list(self._env.keys())
         names.sort(key=len)
         for name in names:
             print(self.repr_kv(name.rjust(10), self._env[name]))
@@ -562,7 +559,7 @@ class Calc(Parser):
         if value is None:
             value = int(not self._env[name])
         self._env[name] = int(value)
-        print self._env[name]
+        print(self._env[name])
 
     def truncint(self, val):
         val = int(val)
@@ -580,7 +577,7 @@ class Calc(Parser):
             raise SyntaxError('function: %s not found' % func)
         doc = self.funcs[func].__doc__
         if doc:
-            print doc
+            print(doc)
 
 if __name__ == '__main__':
     calc = Calc(debug=0)

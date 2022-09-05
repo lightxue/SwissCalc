@@ -38,7 +38,7 @@ class LexTest(unittest.TestCase):
         calc = swisscalc.Calc()
         tok = calc._lexme('0123')[0]
         self.assertEqual(tok.type, 'octint')
-        self.assertEqual(tok.value, 0123)
+        self.assertEqual(tok.value, 0o123)
 
         tok = calc._lexme('0o123')[0]
         self.assertEqual(tok.type, 'octint')
@@ -50,7 +50,7 @@ class LexTest(unittest.TestCase):
 
         tok = calc._lexme('0789')[0]
         self.assertEqual(tok.type, 'octint')
-        self.assertEqual(tok.value, 07)
+        self.assertEqual(tok.value, 0o7)
 
     def test_hex(self):
         calc = swisscalc.Calc()
