@@ -41,10 +41,29 @@ syn match scalc_escape    "\\$"
 syn match scalc_num    "\<0[oO]\=\o\+[wkmgtpezyWKMGTPEZY]\?\>"
 syn match scalc_num    "\<0[xX]\x\+[wkmgtpezyWKMGTPEZY]\?\>"
 syn match scalc_num    "\<0[bB][01]\+[wkmgtpezyWKMGTPEZY]\?\>"
-syn match scalc_num    "\<\%([1-9]\d*\|0\)[wkmgtpezyWKMGTPEZY]\?\>"
-syn match scalc_num    "\<\d\+[eE][+-]\=\d\+[wkmgtpezyWKMGTPEZY]\?\>"
-syn match scalc_num    "\<\d\+\.\%([eE][+-]\=\d\+\)\=\%(\W\|$\)\@=[wkmgtpezyWKMGTPEZY]\?"
-syn match scalc_num    "\%(^\|\W\)\@<=\d*\.\d\+\%([eE][+-]\=\d\+\)\=[wkmgtpezyWKMGTPEZY]\?\>"
+syn match scalc_num    "\<\%([1-9]\d*\|0\)[wkmgtpezyWKMGTPEZY]\?\(iB\)\?\>"
+syn match scalc_num    "\<\d\+[eE][+-]\=\d\+[wkmgtpezyWKMGTPEZY]\?\(iB\)\?\>"
+syn match scalc_num    "\<\d\+\.\%([eE][+-]\=\d\+\)\=\%(\W\|$\)\@=[wkmgtpezyWKMGTPEZY]\?\(iB\)\?\>"
+syn match scalc_num    "\%(^\|\W\)\@<=\d*\.\d\+\%([eE][+-]\=\d\+\)\=[wkmgtpezyWKMGTPEZY]\?\(iB\)\?\>"
+"}}}
+
+"{{{ Unit
+syn match scalc_unit    "亿"
+syn match scalc_unit    "万亿"
+syn match scalc_unit    "KiB"
+syn match scalc_unit    "MiB"
+syn match scalc_unit    "GiB"
+syn match scalc_unit    "TiB"
+syn match scalc_unit    "PiB"
+syn match scalc_unit    "EiB"
+syn match scalc_unit    "ZiB"
+syn match scalc_unit    "YiB"
+"}}}
+
+"{{{ Var
+syntax match scalc_var "\<e\>"
+syntax match scalc_var "\<pi\>"
+syntax match scalc_var "\<phi\>"
 "}}}
 
 "{{{ Delim
@@ -73,6 +92,7 @@ endif
 "}}}
 
 "{{{ Multi-system
+syn match  scalc_bin '\<pretty: '
 syn match  scalc_bin '\<bin: '
 syn match  scalc_oct '\<oct: '
 syn match  scalc_dec '\<dec: '
@@ -88,6 +108,7 @@ HiLink scalc_oct        Define
 HiLink scalc_dec        Keyword
 HiLink scalc_hex        Number
 
+HiLink scalc_var        Keyword
 HiLink scalc_delim      Delimiter
 
 HiLink scalc_string     String
@@ -95,6 +116,7 @@ HiLink scalc_raw_string String
 HiLink scalc_escape     Special
 
 HiLink scalc_num        Number
+HiLink scalc_unit       Number
 HiLink scalc_error      ErrorMsg
 
 "}}}

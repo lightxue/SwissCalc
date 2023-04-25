@@ -463,6 +463,7 @@ class Calc(Parser):
             'oct'    : 0,
             'dec'    : 1,
             'hex'    : 0,
+            'pretty' : 1,
         }
 
     def bin_int(self, integer):
@@ -493,16 +494,79 @@ class Calc(Parser):
         r = [r[i:i+8] for i in range(0, len(r), 8)]
         return 'hex: ' + '\n     '.join(' '.join(line) for line in r)
 
-    def repr_result(self, result):
-        if isinstance(result, str) or isinstance(result, float):
-            return repr(result)
+    def pretty_repr(self, n):
+        if n < 1000:
+            return None
+        res = [
+            format(n, ','),
+            self.size_fmt(n),
+            self.wan_group(n),
+            self.wan_fmt(n)
+        ]
+        return 'pretty: ' + '  '.join(x for x in res if x)
+
+    def size_fmt(self, n):
+        step = 1024.0
+        if n < step:
+            return None
+        for s in ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB']:
+            if n < step:
+                return '%.2f%s' % (n, s)
+            n /= step
+        return '%.2fYiB' % n
+
+    def get_frac_part(self, n):
+        return int((round(n, 2) % 1) * 100)
+
+    def wan_fmt(self, n):
+        step = 10000
+        if n < step:
+            return None
+        u = 'w'
+        for u in ['w', '亿', '万亿']:
+            n /= step
+            if n < step:
+                break
+        if self.get_frac_part(n) == 0:
+            return '{}{}'.format(int(n), u)
+        return '{:.2f}{}'.format(n, u)
+
+    def wan_group(self, n):
+        if n < 10000:
+            return None
+        frac_part = self.get_frac_part(n)
+        digits = str(int(n))
+        groups = []
+        for i in range(len(digits), 0, -4):
+            groups.append(digits[max(0, i-4):i])
+        groups.reverse()
+        res = ','.join(groups)
+        if frac_part:
+            res = '{}.{}'.format(res, frac_part)
+        return res
+
+    def repr_int(self, n):
         nsys = [x for x in ('bin', 'oct', 'dec', 'hex') if self._env[x]]
         if nsys == ['dec']:
-            return repr(result).replace('L', '')
+            return repr(n).replace('L', '')
         res = []
         for ns in nsys:
             func = getattr(self, ns + '_int')
-            res.append(func(result))
+            res.append(func(n))
+        return '\n'.join(res)
+
+    def repr_result(self, result):
+        if isinstance(result, str):
+            return repr(result)
+        res = []
+        if isinstance(result, float):
+            res.append(repr(result))
+        else:
+            res.append(self.repr_int(result))
+        if self._env['pretty']:
+            prt = self.pretty_repr(result)
+            if prt:
+                res.append(prt)
         return '\n'.join(res)
 
     def repr_kv(self, key, val):
