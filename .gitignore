@@ -1,4 +1,7 @@
 *.py[cod]
+autoload/history
+autoload/session
+autoload/swisscalc_Calc_parsetab.py
 
 # C extensions
 *.so
